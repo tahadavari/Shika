@@ -1,0 +1,183 @@
+{% load static tailwind_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <title>Digimo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/theme/static/css/dist/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+          integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    {% tailwind_css %}
+</head>
+
+<body>
+<header class="py-4 shadow-sm bg-white">
+    <div class="container flex item-center justify-between">
+        {#    logo     #}
+        <a href="#">
+            <img src="/static/logo/bc60cf05.svg" class="w-32">
+        </a>
+        {#    search box   #}
+        <div class="w-full max-w-xl relative flex">
+            <span class="absolute left-4 top-3 text-lg text-gray-400">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text"
+                   class="w-full border border-primary border-r-0 pl-12 py-3 pr-3 rounded-l-md focus:outline-none"
+                   placeholder="search">
+            <button class="flex bg-primary border border-primary text-white px-8 rounded-r-md hover:bg-transparent hover:text-primary transition">
+                Search
+            </button>
+        </div>
+        {#    icons    #}
+        <div class="flex items-center space-x-4">
+            <a href="#" class="text-center text-gray-700 hover:text-primary transition relative">
+                <div class="text-2xl">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="text-xs leading-3">Cart</div>
+                <span class="absolute -right-3 -top-1 w-5 h-5 rounded-full flex items-center justify-center bg-primary text-white text-xs">8</span>
+            </a>
+            <a href="#" class="text-center text-gray-700 hover:text-primary transition relative">
+                <div class="text-2xl">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="text-xs leading-3">Account</div>
+            </a>
+        </div>
+    </div>
+</header>
+{#  navbar  #}
+<nav class="bg-gray-800">
+    <div class="container flex">
+        {#    All categories    #}
+        <div class="px-8 py-4 bg-primary flex items-center cursor-pointer relative group">
+            <span class="text-white">
+                <i class="fas fa-bars"></i>
+            </span>
+            <span class="capitalize ml-2 text-white">All categories</span>
+
+            <div class="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
+                <a href="#" class="px-6 py-3 flex items-center hover:bg-gray-100 transition">
+                    <img src="" class="w-5 h-5 abject-contain">
+                    <span class="ml-6 text-gray-600 text-sm">Mobile</span>
+                </a>
+
+                <a href="#" class="px-6 py-3 flex items-center hover:bg-gray-100 transition">
+                    <img src="" class="w-5 h-5 abject-contain">
+                    <span class="ml-6 text-gray-600 text-sm">Mobile</span>
+                </a>
+
+                <a href="#" class="px-6 py-3 flex items-center hover:bg-gray-100 transition">
+                    <img src="" class="w-5 h-5 abject-contain">
+                    <span class="ml-6 text-gray-600 text-sm">Mobile</span>
+                </a>
+
+                <a href="#" class="px-6 py-3 flex items-center hover:bg-gray-100 transition">
+                    <img src="" class="w-5 h-5 abject-contain">
+                    <span class="ml-6 text-gray-600 text-sm">Mobile</span>
+                </a>
+            </div>
+        </div>
+
+        {#    navbar link    #}
+        <div class="flex items-center justify-between flex-grow pl-12">
+            <div class="flex items-center space-x-6 capitalize">
+                <a href="#" class="text-gray-200 hover:text-white transition">Home</a>
+                <a href="#" class="text-gray-200 hover:text-white transition">About us</a>
+                <a href="#" class="text-gray-200 hover:text-white transition">Contact us</a>
+            </div>
+            <i class="fas fa-login"></i>
+            <a href="#" class="text-gray-200 hover:text-white transition">Login / Register</a>
+        </div>
+
+    </div>
+</nav>
+{#  breadcums  #}
+<div class="container py-4 flex items-center gap-3 ">
+    <a href="home.html" class="text-primary text-base">
+        <i class="fas fa-home"></i>
+    </a>
+    <span class="text-sm text-gray-400">
+        <i class="fas fa-chevron-right"></i>
+    </span>
+    <p class="text-gray-600">Shop</p>
+</div>
+{#  breadcums end  #}
+{#  shop  #}
+<div class="container grid grid-cols-4 gap-6 pt-4 pb-16 items-start">
+    {#  sidebar  #}
+    <div class="col-span-1 bg-white px-4 pb-6 shadow rounded overflow-hidden">
+        <div class="divide-y divide-gray-200 space-y-5">
+            {#  category filter  #}
+            <div>
+                <h3 class="text-xl text-gray-800 mb-3 uppercase font-medium">categories</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="cat-1" class="text-primary focus:ring-0 rounded-sm cursor-pointer">
+                        <label for="cat-1" class="text-gray-600 ml-3 cursor-pointer">mardane</label>
+                        <div class="ml-auto text-gray-600 text-sm">(15)</div>
+                    </div>
+                </div>
+            </div>
+            {#  category filter end  #}
+            {#  brand filter  #}
+            <div class="pt-4">
+                <h3 class="text-xl text-gray-800 mb-3 uppercase font-medium">brands</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="cat-1" class="text-primary focus:ring-0 rounded-sm cursor-pointer">
+                        <label for="cat-1" class="text-gray-600 ml-3 cursor-pointer">Nike</label>
+                        <div class="ml-auto text-gray-600 text-sm">(15)</div>
+                    </div>
+                </div>
+            </div>
+            {#  brand filter end  #}
+            {#  price filter  #}
+            <div class="pt-4">
+                <h3 class="text-xl text-gray-800 mb-3 uppercase font-medium">price</h3>
+                <div class="mt-4 flex items-center">
+                    <input type="text"
+                           class="w-full border-gray-300 focus:border-primary focus:ring-0 px-3 py-1 text-gray-600 text-sm shadow-sm rounded"
+                           placeholder="min">
+                    <span class="mx-3 text-gray-500">-</span>
+                    <input type="text"
+                           class="w-full border-gray-300 focus:border-primary focus:ring-0 px-3 py-1 text-gray-600 text-sm shadow-sm rounded"
+                           placeholder="max">
+
+                </div>
+            </div>
+            {#  price filter end  #}
+            {#  size filter  #}
+            <div class="pt-4">
+                <h3 class="text-xl text-gray-800 mb-3 uppercase font-medium">size</h3>
+            </div>
+        </div>
+        {#  size filter end  #}
+    </div>
+    {#  sidebar end  #}
+    {#  product  #}
+    {#  sorting  #}
+    <select class="w-44 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
+        <option>Most Visited</option>
+        <option>Most Sales</option>
+        <option>Latest Product</option>
+        <option>Price Low-High</option>
+        <option>Price High-Low</option>
+    </select>
+    {#  sorting end  #}
+    {#  product grid  #}
+    <div class="grid grid-cols-3 gap-6">
+
+    </div>
+    {#  product grid end  #}
+</div>
+{#  shop end #}
+
+</body>
+</html>
