@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 from django.utils.translation import gettext as _
+from rest_framework.reverse import reverse
 
 from core.models import BaseModel
 
@@ -51,15 +52,21 @@ class Product(BaseModel):
     short_detail = models.CharField(max_length=500, verbose_name=_('Short Detail'))
     detail = models.CharField(max_length=2000, verbose_name=_('Detail'))
 
+    def __str__(self):
+        return self.name
 
-def __str__(self):
-    return self.name
+    def get_url(self):
+        print('pk',self.pk)
+        return reverse('product_detail', args=(self.pk,))
 
 
 class ProductImage(BaseModel):
     product_id = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_('Product'), related_name='images')
     image = models.ImageField(verbose_name=_('Image'), upload_to='product', default='/product/default.jpg')
     main = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('-update_timestamp',)
 
 
 class Size(BaseModel):

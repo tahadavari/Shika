@@ -36,8 +36,17 @@
                 <a href="#" class="text-gray-200 hover:text-white transition">About us</a>
                 <a href="#" class="text-gray-200 hover:text-white transition">Contact us</a>
             </div>
-            <i class="fas fa-login"></i>
-            <a href="#" class="text-gray-200 hover:text-white transition">Login / Register</a>
+            {% if user.is_anonymous %}
+                 <a href="#" class="text-gray-200 hover:text-white transition">
+                Login / Register
+
+            </a>
+            {% else %}
+                <a href="#" class="text-gray-200 hover:text-white transition capitalize">
+                    {{ user }}
+                    <i class="fas fa-user text-white"></i>
+                </a>
+            {% endif %}
         </div>
 
     </div>
