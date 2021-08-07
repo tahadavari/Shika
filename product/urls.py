@@ -9,4 +9,4 @@ from product.views import product_api, product_detail
 urlpatterns = [
                   path('<int:pk>/', product_detail, name='product_detail')
 
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+              ]

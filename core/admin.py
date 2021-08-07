@@ -2,7 +2,7 @@ from django.utils import timezone
 
 from django.contrib import admin
 
-
+from core.models import User
 # Register your models here.
 
 @admin.action(description='Logical Delete')
@@ -11,3 +11,4 @@ def logical_delete(modeladmin, request, queryset):
 
 
 admin.site.add_action(logical_delete)
+admin.site.register(User)

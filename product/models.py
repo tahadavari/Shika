@@ -56,7 +56,6 @@ class Product(BaseModel):
         return self.name
 
     def get_url(self):
-        print('pk',self.pk)
         return reverse('product_detail', args=(self.pk,))
 
 
