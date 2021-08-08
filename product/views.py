@@ -1,23 +1,29 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.db.models import Q
 
 # Create your views here.
 from rest_framework.views import APIView
 
 from core.admin import logical_delete
-from product.models import Product, ProductImage, Size
+from product.models import Product, ProductImage, Size, Category, Brand
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, mixins
-from product.serializers import ProductSerializer
+from product.serializers import ProductSerializer, CategorySerializer, ProductBriefSerializer, BrandSerializer, \
+    SizeSerializer
 
 
 def product_detail(request, pk):
+    parent_category = Category.objects.filter(parent=None)
+    child_category = Category.objects.filter(~Q(parent=None))
     product = Product.objects.get(id=pk)
     product_image_main = ProductImage.objects.filter(main=True, product_id=product).first()
     product_images = ProductImage.objects.filter(product_id=product)
     product_sizes = Size.objects.filter(product=product)
-    return render(request, 'product.html', context={'product': product, 'product_image_main': product_image_main,
-                                                    'product_sizes': product_sizes, 'product_images': product_images})
+    return render(request, 'product.html',
+                  context={'parent_category': parent_category, 'child_category': child_category, 'product': product,
+                           'product_image_main': product_image_main,
+                           'product_sizes': product_sizes, 'product_images': product_images})
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -41,14 +47,32 @@ def product_api(request):
             return JsonResponse(s.errors, status=400)
 
 
-class ProductList(generics.ListCreateAPIView):
+class ProductList(generics.ListAPIView):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    serializer_class = ProductBriefSerializer
 
 
-class ProductDetail(generics.DestroyAPIView, generics.UpdateAPIView,generics.RetrieveAPIView):
+class ProductDetail(generics.DestroyAPIView, generics.UpdateAPIView, generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_url_kwarg = 'pk'
     lookup_field = 'id'
 
+
+class CategoryListAPI(generics.ListAPIView):
+    queryset = Category.objects.filter(parent=None)
+    serializer_class = CategorySerializer
+
+
+class BrandListAPI(generics.ListAPIView):
+    queryset = Brand.objects.all()
+    serializer_class = BrandSerializer
+
+
+class SizeList(generics.ListAPIView):
+    queryset = Size.objects.all().distinct('quantity')
+    serializer_class = SizeSerializer
+
+
+def all_product(request):
+    return render(request, 'shop.html')

@@ -1,9 +1,14 @@
 from rest_framework import generics
 # Create your views here.
+from customer.forms import RegisterForm
 from customer.serializers import CustomerListSerializer, CustomerDetailSerializer, AddressDetailSerializer, \
     AddressListSerializer
 from customer.models import Customer, Address
 from customer.permissions import IsSuperUser, IsOwner
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
 
 
 class CustomerListAPI(generics.ListAPIView):
@@ -36,3 +41,29 @@ class AddressDetailAPI(generics.RetrieveAPIView):
     permissions = [
         IsOwner
     ]
+
+
+class Login(LoginView):
+    template_name = 'registration/login.html'
+    redirect_authenticated_user = True
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('home')
+
+
+def register(request):
+    form = RegisterForm(request.POST)
+    if form.is_valid():
+        form.save()
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password1')
+        phone = form.cleaned_data.get('phone')
+        email = form.cleaned_data.get('email')
+        user = authenticate(username=username, password=password, phone=phone, email=email)
+        login(request, user)
+        return redirect('home')
+    else:
+        form = RegisterForm()
+    return render(request, 'registration/register.html', {'form': form})

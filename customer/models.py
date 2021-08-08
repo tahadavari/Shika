@@ -11,6 +11,7 @@ class Customer(User, BaseModel):
 
 
 class Address(BaseModel):
+    title = models.CharField(max_length=50,verbose_name=_('Title'),default='My address')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, verbose_name=_('Customer'))
     state = models.CharField(max_length=50, verbose_name=_('State'))
     city = models.CharField(max_length=50, verbose_name=_('City'))

@@ -1,5 +1,6 @@
+{% load product_extras %}
 <div class="container">
-    <a href="{{ product.product_id.get_url }}">
+    <a href="{% url 'product_detail' product.product_id.id %}">
         <div class="max-w-xs w-full bg-primary shadow-lg rounded-xl p-6">
             <div class="flex flex-col ">
                 <div class="">
@@ -13,7 +14,9 @@
                                 {{ product.product_id.name }}
                             </div>
                         </div>
-                        <div class="text-md text-center text-white font-semibold mt-1 justify-center">{{ product.product_id.price }}
+                        <div class="text-md text-center text-white font-semibold mt-1 justify-center">
+                            {{ product.product_id|final_price }} $
+                             <p class="text-base text-gray-400 line-through ">{{ product.product_id.price }} $</p>
                         </div>
                     </div>
                 </div>

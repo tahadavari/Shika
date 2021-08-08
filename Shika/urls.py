@@ -17,18 +17,20 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+import customer.urls
 import product.urls
 from Shika import settings
 
-from core.views import tail
+from core.views import home
 from customer.views import AddressDetailAPI, AddressListAPI, CustomerDetailAPI, CustomerListAPI
 from product.views import product_api, ProductList, ProductDetail
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
-                  path('', tail, name='home'),
+                  path('', home, name='home'),
                   path('api/', product_api),
                   path('product/', include(product.urls)),
+                  path('', include(customer.urls)),
                   path('productlist/', ProductList.as_view()),
                   path('productdetail/<int:pk>', ProductDetail.as_view()),
                   path('customerlist/', CustomerListAPI.as_view()),

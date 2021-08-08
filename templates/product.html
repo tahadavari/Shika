@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load product_extras %}
 {% block main %}
     {#  product view  #}
     <div class="container grid grid-cols-2 gap-6 mt-4">
@@ -17,11 +18,13 @@
             <h2 class="text-3xl font-medium uppercase mb-2 ">{{ product.name }}</h2>
             <div class="flex items-center mb-4">
                 <div class="flex gap-1 text-sm text-yellow-400">
-                    <span><i class="fas fa-star"></i> </span>
-                    <span><i class="fas fa-star"></i> </span>
-                    <span><i class="fas fa-star"></i> </span>
-                    <span><i class="fas fa-star"></i> </span>
-                    <span><i class="fas fa-star"></i> </span>
+                    {% for yellow_star in product.score|round %}
+                        <span><i class="fas fa-star"></i> </span>
+                    {% endfor %}
+                    {% for white_star in product.score|round2 %}
+                        <span><i class="fas fa-star text-gray-200"></i> </span>
+                    {% endfor %}
+
                 </div>
                 <div class="text-xs text-gray-500 ml-3">({{ product.view }} Reviews)</div>
             </div>
@@ -31,30 +34,44 @@
                     <span class="text-green-600">In Stock</span>
                 </p>
                 <p class="text-gray-800 font-semibold">
-                    <span>Brand</span>
-                    <span class="text-green-600">Nike</span>
+                    <span>Brand : </span>
+                    <span class="text-green-600">{{ product.brand.name }}</span>
                 </p>
                 <p class="text-gray-800 font-semibold">
-                    <span>Category</span>
-                    <span class="text-green-600">Men/sport</span>
+                    <span>Category : </span>
+                    <span class="text-green-600">{{ product.category.parent.name }} / {{ product.category.name }}</span>
                 </p>
             </div>
             <div class="flex items-baseline mb-1 space-x-2 fonr-robot mt-4">
-                <p class="text-2xl text-primary font-semibold">{{ product.price }}</p>
-                <p class="text-base text-gray-400 line-through">55.00$</p>
+                <p class="text-2xl text-primary font-semibold">{{ product|final_price }} $</p>
+                <p class="text-base text-gray-400 line-through">{{ product.price }} $</p>
             </div>
             <p class="mt-4 text-gray-600">
                 cmkmdkcmK:Mck;MKmcKLmckl;McklMckl;mKL:MDcklmKL:DcKL:Mckl;ml
             </p>
-            <div>
-                {#  size filter  #}
+            <div class="mt-4">
+                <p class="text-gray-800 font-semibold">
+                    <span>Size : </span>
+                </p>
+                <select class="w-44 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
+                    {% for size in product_sizes %}
+                        {% if size.quantity != 0 %}
+                            <option>{{ size.size }}</option>
+                        {% endif %}
+                    {% endfor %}
+
+                </select>
             </div>
             <div class="mt-4">
                 <h3 class="text-sm text-gray-800 uppercase mb-1">Quantity</h3>
                 <div class="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
-                    <div class="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none">-</div>
-                    <div class="h-8 w-8 text-base flex items-center justify-center">4</div>
-                    <div class="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none">+</div>
+                    <div onclick="decreaseCount()"
+                         class="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none">-
+                    </div>
+                    <div id="count" class="h-8 w-8 text-base flex items-center justify-center">4</div>
+                    <div onclick="increaseCount()"
+                         class="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none">+
+                    </div>
                 </div>
             </div>
             <div class="flex gap-3 border-b border-gray-200 pb-5 mt-6">
@@ -68,4 +85,15 @@
 
     </div>
     {#  end product view  #}
+
+    <script>
+        function increaseCount() {
+            document.getElementById('count').innerText = parseInt(document.getElementById('count').innerText) + 1
+        }
+
+        function decreaseCount() {
+            if (document.getElementById('count').innerText > 0)
+                document.getElementById('count').innerText = parseInt(document.getElementById('count').innerText) - 1
+        }
+    </script>
 {% endblock %}

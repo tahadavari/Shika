@@ -7,25 +7,8 @@
             </span>
             <span class="capitalize ml-2 text-white">All categories</span>
 
-            <div class="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
-                {% for category in parent_category %}
-                    <a href="#" class="px-6 py-3 flex items-center hover:bg-gray-100 transition group">
-                        <img src="{{ category.icon.url }}" class="w-5 h-5 abject-contain">
-                        <span class="ml-6 text-gray-600 text-sm">{{ category.name }}</span>
-                    </a>
-                    {% for subcategory in child_category %}
-                        {% if subcategory.parent == category %}
-                            <ul class="list-disc items-center">
-                                <li class="pl-12 hover:bg-gray-100 transition">
-                                    <a href="#" class="px-6 py-3 flex items-center hover:bg-gray-100 transition">
-                                        <img src="{{ subcategory.icon.url }}" class="w-5 h-5 abject-contain">
-                                        <span class="ml-6 text-gray-600 text-xs">{{ subcategory.name }}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}
+            <div id="category"
+                 class="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
             </div>
         </div>
 
@@ -37,17 +20,90 @@
                 <a href="#" class="text-gray-200 hover:text-white transition">Contact us</a>
             </div>
             {% if user.is_anonymous %}
-                 <a href="#" class="text-gray-200 hover:text-white transition">
-                Login / Register
-
-            </a>
+                <a href="{% url 'login' %}" class="text-gray-200 hover:text-white transition">Login / Register</a>
             {% else %}
-                <a href="#" class="text-gray-200 hover:text-white transition capitalize">
-                    {{ user }}
-                    <i class="fas fa-user text-white"></i>
-                </a>
+                <div class="px-8 py-4 bg-primary flex items-center cursor-pointer relative group">
+            <span class="text-white">
+                <i class="fas fa-user"></i>
+            </span>
+                    <span class="capitalize ml-2 text-white">{{ user }}</span>
+
+                    <div class="absolute w-full left-0 top-full bg-white shadow-md py-3 divide-y divide-gray-300 divide-dashed opacity-0 group-hover:opacity-100 transition duration-300 invisible group-hover:visible">
+                        <a href="#" class="px-6 py-3 flex items-center hover:bg-gray-100 transition">
+                            <img src="" class="w-5 h-5 abject-contain">
+                            <span class="ml-6 text-gray-600 text-sm">Profile</span>
+                        </a>
+
+                        <a href="{% url 'logout' %}" class="px-6 py-3 flex items-center hover:bg-gray-100 transition">
+                            <img src="" class="w-5 h-5 abject-contain">
+                            <span class="ml-6 text-gray-600 text-sm">Logout</span>
+                        </a>
+                    </div>
+                </div>
             {% endif %}
         </div>
 
     </div>
+    <script>
+        $.ajax({
+            type: 'GET',
+            url: '{% url 'category_list_api' %}',
+            success: function (response, status, xhr) {
+                let category_list = response
+                let category_tag = document.getElementById('category')
+                for (let parent_category of category_list) {
+                    let a_tag = document.createElement("a")
+                    a_tag.className = "px-6 py-3 flex items-center hover:bg-gray-100 transition group"
+                    a_tag.setAttribute("href", "#")
+
+                    let img_tag = document.createElement('img')
+                    img_tag.className = "w-5 h-5 abject-contain"
+                    img_tag.setAttribute("src", parent_category.icon)
+
+                    let span_tag = document.createElement('span')
+                    span_tag.className = "ml-6 text-gray-600 text-sm"
+                    span_tag.innerText = parent_category.name
+
+                    a_tag.appendChild(img_tag)
+                    a_tag.appendChild(span_tag)
+
+
+                    if (parent_category.subcategories !== []) {
+                        var ul_tag = document.createElement('ul')
+                        ul_tag.className = "list-disc items-center"
+                    }
+                    for (let sub_category of parent_category.subcategories) {
+
+                        let li_tag = document.createElement('li')
+                        li_tag.className = "pl-12 hover:bg-gray-100 transition"
+
+                        let sub_a_tag = document.createElement("a")
+                        sub_a_tag.className = "px-6 py-3 flex items-center hover:bg-gray-100 transition group"
+                        sub_a_tag.setAttribute("href", "#")
+
+                        let sub_img_tag = document.createElement('img')
+                        sub_img_tag.className = "w-5 h-5 abject-contain"
+                        sub_img_tag.setAttribute("src", sub_category.icon)
+
+                        let sub_span_tag = document.createElement('span')
+                        sub_span_tag.className = "ml-6 text-gray-600 text-sm"
+                        sub_span_tag.innerText = sub_category.name
+
+                        sub_a_tag.appendChild(sub_img_tag)
+                        sub_a_tag.appendChild(sub_span_tag)
+
+                        li_tag.appendChild(sub_a_tag)
+
+                        ul_tag.appendChild(li_tag)
+
+
+                    }
+                    category_tag.appendChild(a_tag)
+                    category_tag.appendChild(ul_tag)
+
+
+                }
+            }
+        })
+    </script>
 </nav>

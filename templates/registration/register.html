@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block main %}
+    {# Login #}
+    <div class="container py-16">
+        <div class="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
+            <h2 class="text-2xl uppercase font-medium mb-1">register</h2>
+            <p class="text-gray-600 mb-6 text-sm">lorem ipusem kmdklmcklsadml</p>
+            <form method="post">
+                <div class="space-y-4">
+                    {% csrf_token %}
+                    {#                    <div>#}
+                    {#                        <label for="first_name" class="text-gray-600 mb-2 block">First Name</label>#}
+                    {#                        <input id="first_name" type="text"#}
+                    {#                               class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:border-primary focus:ring-0 placeholder-gray-400"#}
+                    {#                               placeholder="Enter your First Name">#}
+                    {#                    </div>#}
+                    {% for field in form %}
+                        <p>
+                            {{ field.label_tag }}<br>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small style="color: grey">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <p style="color: red">{{ error }}</p>
+                            {% endfor %}
+                        </p>
+                    {% endfor %}
+                    <button type="submit">Sign up</button>
+                </div>
+            </form>
+            <div class="mt-6 flex justify-center relative">
+                <div class="text-gray-600 uppercase px-3 bg-white z-10 relative">or login with</div>
+                <div class="absolute left-0 top-3 w-full border-b-2 border-gray-200"></div>
+            </div>
+            <div class="flex mt-4">
+                <button
+                        class="py-2 block w-full bg-primary border border-primary text-white px-8 rounded hover:bg-transparent hover:text-primary transition font-medium font-roboto">
+                    GOOGLE
+                </button>
+            </div>
+            <p class="mt-4 text-gray-600 text-center">
+                Dont have an account? <a class="text-primary" href="#">Register now</a>
+            </p>
+        </div>
+    </div>
+    {# Login end #}
+{% endblock main %}
+

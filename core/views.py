@@ -5,7 +5,7 @@ from django.db.models import Q
 from product.models import Category, Product, ProductImage
 
 
-def tail(requests):
+def home(requests):
     parent_category = Category.objects.filter(parent=None)
     child_category = Category.objects.filter(~Q(parent=None))
     top_new: ProductImage = ProductImage.objects.filter(main=True)[:4]

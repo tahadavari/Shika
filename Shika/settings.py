@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'order'
 ]
 
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,8 +83,12 @@ WSGI_APPLICATION = 'Shika.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'shika',
+        'USER': 'postgres',
+        'PASSWORD': '07042002',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
