@@ -18,12 +18,13 @@
         </div>
         {#    icons    #}
         <div class="flex items-center space-x-4">
-            <a href="#" class="text-center text-gray-700 hover:text-primary transition relative">
+            <a href="{% url 'cart' %}" class="text-center text-gray-700 hover:text-primary transition relative">
                 <div class="text-2xl">
                     <i class="fas fa-shopping-bag"></i>
                 </div>
                 <div class="text-xs leading-3">Cart</div>
-                <span class="absolute -right-3 -top-1 w-5 h-5 rounded-full flex items-center justify-center bg-primary text-white text-xs">8</span>
+                <span id="CartQuantity"
+                      class="absolute -right-3 -top-1 w-5 h-5 rounded-full flex items-center justify-center bg-primary text-white text-xs">0</span>
             </a>
             <a href="#" class="text-center text-gray-700 hover:text-primary transition relative">
                 <div class="text-2xl">
@@ -33,6 +34,15 @@
             </a>
         </div>
     </div>
+    <script>
+        $.ajax({
+            type: 'GET',
+            url: '{% url 'cart_quantity' %}',
+            success: function (response, status, xhr) {
+                $('#CartQuantity').text(response.total_item)
+            }
+        })
+    </script>
 
 </header>
 

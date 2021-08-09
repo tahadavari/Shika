@@ -83,13 +83,9 @@ WSGI_APPLICATION = 'Shika.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'shika',
-        'USER': 'postgres',
-        'PASSWORD': '07042002',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.shika',
+    },
 }
 
 # Password validation

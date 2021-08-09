@@ -1,5 +1,4 @@
 from django.db import models
-
 # Create your models here.
 from django.utils.translation import gettext as _
 from rest_framework.reverse import reverse
@@ -35,13 +34,13 @@ class Category(BaseModel):
 
 class Discount(BaseModel):
     name = models.CharField(max_length=100, verbose_name=_('Name'))
-    percent = models.IntegerField(verbose_name=_('Percent'))
-    max_discount = models.IntegerField(verbose_name=_('Maximum'))
-
-
-def mainimg(self):
-    main = ProductImage.objects.filter(product=self, main=True)
-    return main
+    percent = models.IntegerField(verbose_name=_('Percent'), default=0)
+    amount = models.IntegerField(verbose_name=_('Amount'), default=0)
+    type = models.CharField(verbose_name=_('Type'), max_length=10, choices=[
+        ('PR', 'Percent'),
+        ('AM', 'Amount')
+    ], default=None, null=True, blank=True)
+    max_discount = models.IntegerField(verbose_name=_('Maximum'), default=0)
 
 
 class Product(BaseModel):
@@ -62,19 +61,34 @@ class Product(BaseModel):
     detail = models.CharField(max_length=2000, verbose_name=_('Detail'))
 
     def __str__(self):
-        return self.name
+        if self.name:
+            return str(self.name)
+        else:
+            return self.brand
 
     def get_url(self):
         return reverse('product_detail', args=(self.pk,))
 
     def final_price(self):
-        dis = round((self.discount.percent * self.price) / 100)
-        if dis > self.discount.max_discount:
-            return self.price - 50
-        return self.price - dis
+        if self.discount:
+            if self.discount.percent :
+                dis = round((self.discount.percent * self.price) / 100)
+                if dis > self.discount.max_discount:
+                    return self.price - 50
+                return self.price - dis
+            elif self.discount.amount != 0:
+                return self.price - self.discount.amount
+        else:
+            return self.price
 
     def main_image_url(self):
         return self.images.filter(main=True).first()
+
+    def availability(self):
+        if len(self.sizes.all().filter(quantity__gt=0)):
+            return True
+        else:
+            return False
 
 
 class ProductImage(BaseModel):
@@ -86,13 +100,13 @@ class ProductImage(BaseModel):
         ordering = ('-update_timestamp',)
 
     def __str__(self):
-        return self.product_id
+        return self.product_id.name
 
 
 class Size(BaseModel):
     size = models.IntegerField(verbose_name=_('Size'))
     quantity = models.IntegerField(verbose_name=_('Quantity'))
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='sizes')
 
     def __str__(self):
         return f'{self.product.name} : {self.size}'

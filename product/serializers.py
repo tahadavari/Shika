@@ -39,7 +39,7 @@ class ProductBriefSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'price', 'final_price', 'main_image']
+        fields = ['id', 'name', 'price', 'final_price', 'main_image', 'get_url']
         read_only_fields = ['id']
 
     def get_main_image(self, obj):
@@ -75,7 +75,6 @@ class CategorySerializer(serializers.ModelSerializer):
         return product_sub + product_parent
 
     def get_child_categories(self, obj):
-        """ self referral field """
         serializer = CategorySerializer(
             instance=obj.subcategory.all(),
             many=True

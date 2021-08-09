@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
 {% load product_extras %}
 {% block main %}
+    {% csrf_token %}
+
     {#  product view  #}
     <div class="container grid grid-cols-2 gap-6 mt-4">
         {#  product image  #}
         <div>
-            <img src="{{ product_image_main.image.url }}" class="w-full">
+            <img id="ProductImage" src="{{ product_image_main.image.url }}" class="w-full">
             <div class="grid grid-cols-5 gap-4 mt-4">
                 {% for img in product_images %}
                     <img src="{{ img.image.url }}" class="w-full cursor-pointer border">
@@ -43,42 +45,53 @@
                 </p>
             </div>
             <div class="flex items-baseline mb-1 space-x-2 fonr-robot mt-4">
-                <p class="text-2xl text-primary font-semibold">{{ product|final_price }} $</p>
-                <p class="text-base text-gray-400 line-through">{{ product.price }} $</p>
+                <p id="ProductFinalPrice" class="text-2xl text-primary font-semibold">{{ product.final_price }}</p>
+                {% if product.price != product.final_price %}
+                    <p id="ProductPrice" class="text-base text-gray-400 line-through">{{ product.price }}</p>
+                {% endif %}
+
             </div>
             <p class="mt-4 text-gray-600">
                 cmkmdkcmK:Mck;MKmcKLmckl;McklMckl;mKL:MDcklmKL:DcKL:Mckl;ml
             </p>
-            <div class="mt-4">
-                <p class="text-gray-800 font-semibold">
-                    <span>Size : </span>
-                </p>
-                <select class="w-44 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
-                    {% for size in product_sizes %}
-                        {% if size.quantity != 0 %}
-                            <option>{{ size.size }}</option>
-                        {% endif %}
-                    {% endfor %}
+            {% if product.availability %}
+                <input type="hidden" id="ProductId" value="{{ product.id }}">
+                <input type="hidden" id="ProductName" value="{{ product.name }}">
+                <div class="mt-4">
+                    <p class="text-gray-800 font-semibold">
+                        <span>Size : </span>
+                    </p>
+                    <select id="ProductSize"
+                            class="w-44 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
+                        {% for size in product_sizes %}
+                            {% if size.quantity != 0 %}
+                                <option>{{ size.size }}</option>
+                            {% endif %}
+                        {% endfor %}
 
-                </select>
-            </div>
-            <div class="mt-4">
-                <h3 class="text-sm text-gray-800 uppercase mb-1">Quantity</h3>
-                <div class="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
-                    <div onclick="decreaseCount()"
-                         class="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none">-
-                    </div>
-                    <div id="count" class="h-8 w-8 text-base flex items-center justify-center">4</div>
-                    <div onclick="increaseCount()"
-                         class="h-8 w-8 text-xl flex items-center justify-center cursor-pointer select-none">+
+                    </select>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-sm text-gray-800 uppercase mb-1">Quantity</h3>
+                    <div class="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
+                        <input type="number" id="ProductQuantity" value="1"
+                               class="w-44 rounded text-base flex items-center justify-center text-center">
                     </div>
                 </div>
-            </div>
+            {% endif %}
+
             <div class="flex gap-3 border-b border-gray-200 pb-5 mt-6">
-                <a href="#"
-                   class="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
-                    <i class="fas fa-shopping-bag"></i> Add to cart
-                </a>
+                {% if product.availability %}
+                    <button id="AddToCartBtn"
+                            class="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
+                        <i class="fas fa-shopping-bag"></i> Add to cart
+                    </button>
+                {% else %}
+                    <div
+                            class="bg-gray-600 border border-red text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 ">
+                        <i class="fas fa-shopping-bag text-white"></i> unavailable
+                    </div>
+                {% endif %}
             </div>
         </div>
         {#  end product content  #}
@@ -87,13 +100,33 @@
     {#  end product view  #}
 
     <script>
-        function increaseCount() {
-            document.getElementById('count').innerText = parseInt(document.getElementById('count').innerText) + 1
-        }
+        $('#AddToCartBtn').on('click', function () {
+            let p_image = $('#ProductImage').attr('src')
+            let p_quantity = $('#ProductQuantity').val()
+            let p_id = $('#ProductId').val()
+            let p_size = $('#ProductSize option:selected').text()
+            let p_price = $('#ProductPrice').text()
+            let p_final_price = $('#ProductFinalPrice').text()
+            let p_name = $('#ProductName').val();
 
-        function decreaseCount() {
-            if (document.getElementById('count').innerText > 0)
-                document.getElementById('count').innerText = parseInt(document.getElementById('count').innerText) - 1
-        }
+            console.log(p_image, p_name, p_quantity, p_id, p_size, p_price)
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'add_to_cart' %}',
+                data: {
+                    'id': p_id,
+                    'quantity': p_quantity,
+                    'size': p_size,
+                    'price': p_price,
+                    'final_price': p_final_price,
+                    'name': p_name,
+                    'main_image': p_image
+                },
+                success: function (response, status, xhr) {
+                    $('#CartQuantity').text(response.total_item)
+                }
+            })
+        })
     </script>
 {% endblock %}

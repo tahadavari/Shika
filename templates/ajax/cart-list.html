@@ -1,0 +1,54 @@
+ <div class="shopping-cart">
+            <!-- Title -->
+            <div class="title flex items-center justify-between">
+                <div class="uppercase">Shopping Cart</div>
+                <div>{{ total_item }}</div>
+            </div>
+
+            {% for product_id,item in cart_data.items %}
+
+                <div class="item">
+                    <div class="buttons">
+                        <span class="delete-btn" data-item="{{ product_id }}"></span>
+                    </div>
+
+                    <div class="image w-16">
+                        <img src="{{ item.main_image }}" alt=""/>
+                    </div>
+
+                    <div class="description">
+                        <span>{{ item.size }}</span>
+                        <span></span>
+                        <span>Size</span>
+                    </div>
+
+                    <div class="quantity">
+                        <input onchange="final_price(this.value)" type="number" name="name" value="{{ item.quantity }}"
+                               min="1">
+                    </div>
+                    {% if item.price != "" %}
+                        <div id="p_price_{{ product_id }}" class="price">{{ item.price }}</div>
+                    {% else %}
+                        <div id="p_price_{{ product_id }}" class="final-price">{{ item.final_price }}</div>
+                    {% endif %}
+                    <div id="p_final_price_{{ product_id }}" class="final-price">{{ item.final_price }}</div>
+                    <div id="p_total_price_{{ product_id }}"
+                         class="total-price">{% widthratio item.final_price 1 item.quantity %}</div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="Checkout flex   justify-center">
+            <!-- Title -->
+            <div class="title">
+                Checkout
+            </div>
+
+            <!-- Product #1 -->
+            <div class="item">
+
+                <div class="price">{{ total_amount }}</div>
+                <div class="final-price">{{ total_final_amount }}</div>
+
+            </div>
+            <button class="items-center bg-primary text-white h-24 rounded-sm">Checkout</button>
+        </div>

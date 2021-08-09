@@ -77,17 +77,16 @@
         <h1 class="text-2xl font-medium text-gray-800 uppercase mb-6">top new</h1>
         <div class="grid grid-cols-4 gap-3">
             {% for product in top_new %}
-                {{ top_new.product_id.get_url }}
                 {% include 'product_card.html' %}
             {% endfor %}
         </div>
     </div>
     <div class="container py-16">
         <h1 class="text-2xl font-medium text-gray-800 uppercase mb-6">top sales</h1>
-        <div class="grid grid-cols-4 gap-3">
-            {% for product in top_sales %}
-                {% include 'product_card.html' %}
-            {% endfor %}
+        <div id="Top" class="grid grid-cols-4 gap-3">
+                        {% for product in top_sales %}
+                            {% include 'product_card.html' %}
+                        {% endfor %}
         </div>
     </div>
     {#  end product new #}
@@ -98,5 +97,8 @@
         </a>
     </div>
     {#  ad section end  #}
+    <script>
+
+    </script>
 {% endblock %}
 
