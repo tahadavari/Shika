@@ -9,6 +9,9 @@ from core.models import User, BaseModel
 class Customer(User, BaseModel):
     phone = models.CharField(max_length=11, verbose_name=_('Phone'), unique=True)
 
+    def get_pending_order(self):
+        pending_order = self.orders.filter(status='PE')
+        return pending_order if pending_order else False
 
 class Address(BaseModel):
     title = models.CharField(max_length=50,verbose_name=_('Title'),default='My address')

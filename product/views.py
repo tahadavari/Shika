@@ -85,40 +85,4 @@ def all_product(request):
     return render(request, 'shop.html')
 
 
-@csrf_exempt
-def add_to_cart(request):
-    product_cart = {}
-    product_cart[request.POST['id']] = {
-        'name': request.POST['name'],
-        'quantity': request.POST['quantity'],
-        'size': request.POST['size'],
-        'price': request.POST['price'],
-        'final_price': request.POST['final_price'],
-        'main_image': request.POST['main_image']
-    }
-    if "cart_data" in request.session:
-        if str(request.POST['id']) in request.session['cart_data']:
-            cart_data = request.session['cart_data']
-            cart_data[str(request.POST['id'])]['quantity'] = int(product_cart[str(request.POST['id'])]['quantity'])
-            cart_data.update(cart_data)
-            request.session['cart_data'] = cart_data
-        else:
-            cart_data = request.session['cart_data']
-            cart_data.update(product_cart)
-            request.session['cart_data'] = cart_data
-    else:
-        request.session['cart_data'] = product_cart
-    return JsonResponse({'data': request.session['cart_data'], 'total_item': len(request.session['cart_data'])})
 
-
-def product_card(request):
-    # print(request)
-    return render(request, 'product_card.html')
-
-
-@csrf_exempt
-def cart_quantity(request):
-    if 'cart_data' in request.session:
-        return JsonResponse({'total_item': len(request.session['cart_data'])})
-    else:
-        return JsonResponse({'total_item': 0})

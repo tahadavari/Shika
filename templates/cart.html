@@ -13,33 +13,34 @@
             </div>
 
             {% for product_id,item in cart_data.items %}
-
                 <div class="item">
                     <div class="buttons">
                         <span class="delete-btn" data-item="{{ product_id }}"></span>
                     </div>
 
                     <div class="image w-16">
-                        <img src="{{ item.main_image }}" alt=""/>
+                        <img id="ProductImage-{{ product_id }}" src="{{ item.main_image }}" alt=""/>
                     </div>
 
                     <div class="description">
-                        <span>{{ item.size }}</span>
-                        <span></span>
+                        <span id="ProductName-{{ product_id }}">{{ item.name }}</span>
+                        <span id="ProductSize-{{ product_id }}">{{ item.size }}</span>
                         <span>Size</span>
                     </div>
 
                     <div class="quantity">
-                        <input onchange="final_price(this.value)" type="number" name="name" value="{{ item.quantity }}"
+                        <input id='ProductQuantity-{{ product_id }}' data-item="{{ product_id }}" class='qty-input'
+                               type="number" name="name"
+                               value="{{ item.quantity }}"
                                min="1">
                     </div>
                     {% if item.price != "" %}
-                        <div id="p_price_{{ product_id }}" class="price">{{ item.price }}</div>
+                        <div id="ProductPrice-{{ product_id }}" class="price">{{ item.price }}</div>
                     {% else %}
-                        <div id="p_price_{{ product_id }}" class="final-price">{{ item.final_price }}</div>
+                        <div id="ProductPrice-{{ product_id }}" class="final-price">{{ item.final_price }}</div>
                     {% endif %}
-                    <div id="p_final_price_{{ product_id }}" class="final-price">{{ item.final_price }}</div>
-                    <div id="p_total_price_{{ product_id }}"
+                    <div id="ProductFinalPrice-{{ product_id }}" class="final-price">{{ item.final_price }}</div>
+                    <div id="ProductFinalPrice-{{ product_id }}"
                          class="total-price">{% widthratio item.final_price 1 item.quantity %}</div>
                 </div>
             {% endfor %}
@@ -61,24 +62,38 @@
         </div>
     </div>
     <script>
-        function final_price(value) {
-            console.log(value)
-            let p_final_price = $('#p_final_price_1').text()
-            console.log(p_final_price)
-            $('#p_total_price_1').text(p_final_price * value)
-        }
+        $(document).on('click', '.delete-btn', function () {
+            if (confirm('Are you sure to delete this product?')) {
+                let p_id = $(this).attr('data-item')
 
-        $('.delete-btn').on('click', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url 'delete_from_cart' %}',
+                    data: {
+                        'id': p_id,
+                    },
+                    success: function (response, status, xhr) {
+                        $('#CartList').html(response.data)
+                        $("#CartQuantity").text(response.total_item);
+                    }
+                })
+            }
+
+        })
+
+        $(document).on('click', '.qty-input', function () {
             let p_id = $(this).attr('data-item')
+            let p_quantity = $(this).val()
             $.ajax({
                 type: 'POST',
-                url: '{% url 'delete_from_cart' %}',
+                url: '{% url 'update_to_cart' %}',
                 data: {
                     'id': p_id,
+                    'quantity': p_quantity,
                 },
                 success: function (response, status, xhr) {
+                    console.log(response.data)
                     $('#CartList').html(response.data)
-                    $("#CartQuantity").text(response.total_item);
                 }
             })
         })
