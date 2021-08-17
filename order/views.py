@@ -1,39 +1,65 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 # Create your views here.
-from customer.models import Customer
+from rest_framework import renderers
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.response import Response
+
+from Shika import settings
+from customer.models import Customer, Address
 from order.models import OrderItem, Order
-from product.models import Product
+from order.serializers import OrderDetailSerializer, OrderItemSerializer
+from product.models import Product, Size
 
 
 @csrf_exempt
 def add_to_cart(request):
     product_cart = {}
     product_cart[request.POST['id']] = {
-        'name': request.POST['name'],
+        'order': request.POST['order'],
+        'product': request.POST['id'],
         'quantity': request.POST['quantity'],
         'size': request.POST['size'],
-        'price': request.POST['price'],
-        'final_price': request.POST['final_price'],
-        'main_image': request.POST['main_image']
+        'total': request.POST['total']
     }
-    if "cart_data" in request.session:
-        if str(request.POST['id']) in request.session['cart_data']:
-            cart_data = request.session['cart_data']
-            cart_data[str(request.POST['id'])]['quantity'] = int(product_cart[str(request.POST['id'])]['quantity'])
-            cart_data.update(cart_data)
-            request.session['cart_data'] = cart_data
-        else:
-            cart_data = request.session['cart_data']
-            cart_data.update(product_cart)
-            request.session['cart_data'] = cart_data
-    else:
-        request.session['cart_data'] = product_cart
+    if request.user.is_authenticated:
+        if request.cart:
+            product_cart['order'] = request.cart.id
+            order_item = OrderItemSerializer(data=product_cart[request.POST['id']])
 
-    return JsonResponse({'data': request.session['cart_data'], 'total_item': len(request.session['cart_data'])})
+            if order_item.is_valid():
+                if int(request.POST['id']) in request.cart.get_products_id():
+                    pre_order_item = request.cart.items.get(product_id=int(request.POST['id']))
+                    pre_order_item.quantity = int(product_cart[request.POST['id']]['quantity'])
+                    pre_order_item.total = int(product_cart[request.POST['id']]['quantity']) * int(
+                        product_cart[request.POST['id']]['total'])
+                    pre_order_item.save()
+                    print(pre_order_item.quantity)
+                else:
+                    order_item.save()
+            else:
+                print(order_item.errors)
+            # print(*request.cart.items.all())
+            print(request.cart.get_count())
+            return JsonResponse({'success': 'done', 'total_item': request.cart.get_count()})
+    else:
+        if "cart_data" in request.session:
+            if str(request.POST['id']) in request.session['cart_data']:
+                cart_data = request.session['cart_data']
+                cart_data[str(request.POST['id'])]['quantity'] = int(product_cart[str(request.POST['id'])]['quantity'])
+                cart_data.update(cart_data)
+                request.session['cart_data'] = cart_data
+            else:
+                cart_data = request.session['cart_data']
+                cart_data.update(product_cart)
+                request.session['cart_data'] = cart_data
+        else:
+            request.session['cart_data'] = product_cart
+        print(request.session['cart_data'])
+        return JsonResponse({'data': request.session['cart_data'], 'total_item': len(request.session['cart_data'])})
 
 
 def product_card(request):
@@ -48,68 +74,21 @@ def cart_quantity(request):
         return JsonResponse({'total_item': 0})
 
 
+@login_required()
 def cart(request):
-    total_final_amount = 0
-    for p_id, item in request.session['cart_data'].items():
-        total_final_amount += int(item['quantity']) * int(item['final_price'])
-
-    total_amount = 0
-    for p_id, item in request.session['cart_data'].items():
-        if item['price']:
-            total_amount += int(item['quantity']) * int(item['price'])
-        else:
-            total_amount += int(item['quantity']) * int(item['final_price'])
-
-    return render(request, 'cart.html',
-                  {'cart_data': request.session['cart_data'], 'total_item': len(request.session['cart_data']),
-                   'total_amount': total_amount, 'total_final_amount': total_final_amount})
+    return render(request, 'cart.html')
 
 
-@csrf_exempt
+@login_required()
 def delete_from_cart(request):
-    p_id = str(request.POST['id'])
-    if "cart_data" in request.session:
-        if p_id in request.session['cart_data']:
-            cart_data = request.session['cart_data']
-            del request.session['cart_data'][p_id]
-            request.session['cart_data'] = cart_data
-
-    total_final_amount = 0
-    for p_id, item in request.session['cart_data'].items():
-        total_final_amount += int(item['quantity']) * int(item['final_price'])
-
-    total_amount = 0
-    for p_id, item in request.session['cart_data'].items():
-        if item['price']:
-            total_amount += int(item['quantity']) * int(item['price'])
-        else:
-            total_amount += int(item['quantity']) * int(item['final_price'])
-    t = render_to_string('ajax/cart-list.html',
-                         {'cart_data': request.session['cart_data'], 'total_item': len(request.session['cart_data']),
-                          'total_amount': total_amount, 'total_final_amount': total_final_amount})
-    return JsonResponse({'data': t, 'total_item': len(request.session['cart_data'])})
+    item: OrderItem = request.cart.items.get(id=request.POST['id'])
+    item.delete()
+    html = render_to_string('ajax/cart-list.html', context={'request': request})
+    return JsonResponse({'data': 'done', 'html': html})
 
 
 @csrf_exempt
 def update_to_cart(request):
-    p_id = str(request.POST['id'])
-    p_quantity = request.POST['quantity']
-    if 'cart_data' in request.session:
-        if p_id in request.session['cart_data']:
-            cart_data = request.session['cart_data']
-            cart_data[str(request.POST['id'])]['quantity'] = p_quantity
-            request.session['cart_data'] = cart_data
-            print(request.session['cart_data'])
-    total_final_amount = 0
-    for p_id, item in request.session['cart_data'].items():
-        total_final_amount += int(item['quantity']) * int(item['final_price'])
-
-    total_amount = 0
-    for p_id, item in request.session['cart_data'].items():
-        if item['price']:
-            total_amount += int(item['quantity']) * int(item['price'])
-        else:
-            total_amount += int(item['quantity']) * int(item['final_price'])
     t = render_to_string('ajax/cart-list.html',
                          {'cart_data': request.session['cart_data'], 'total_item': len(request.session['cart_data']),
                           'total_amount': total_amount, 'total_final_amount': total_final_amount})
@@ -117,45 +96,46 @@ def update_to_cart(request):
 
 
 @login_required
+@api_view(['GET', 'POST'])
+@csrf_exempt
+@renderer_classes([renderers.TemplateHTMLRenderer, renderers.JSONRenderer])
 def check_out(request):
-    total_amt = 0
-    totalAmt = 0
-    if 'cartdata' in request.session:
-        for p_id, item in request.session['cartdata'].items():
-            totalAmt += int(item['qty']) * float(item['price'])
-        # Order
-        order = CartOrder.objects.create(
-            user=request.user,
-            total_amt=totalAmt
-        )
-        # End
-        for p_id, item in request.session['cartdata'].items():
-            total_amt += int(item['qty']) * float(item['price'])
-            # OrderItems
-            items = CartOrderItems.objects.create(
-                order=order,
-                invoice_no='INV-' + str(order.id),
-                item=item['title'],
-                image=item['image'],
-                qty=item['qty'],
-                price=item['price'],
-                total=float(item['qty']) * float(item['price'])
+    total_amount = 0
+    item_total_amount = 0
+    if request.method == 'POST':
+        if 'cart_data' in request.session:
+            for p_id, item in request.session['cart_data'].items():
+                total_amount += int(item['quantity']) * int(item['final_price'])
+                print(total_amount)
+            # Order
+            print(request.POST)
+            customer = Customer.objects.get(id=request.user.id)
+            address = Address.objects.get(id=int(request.POST['address']))
+            order = Order.objects.create(
+                customer=customer,
+                total_amount=total_amount,
+                address=address,
+                status='CO'
             )
-        # End
-        # Process Payment
-        host = request.get_host()
-        paypal_dict = {
-            'business': settings.PAYPAL_RECEIVER_EMAIL,
-            'amount': total_amt,
-            'item_name': 'OrderNo-' + str(order.id),
-            'invoice': 'INV-' + str(order.id),
-            'currency_code': 'USD',
-            'notify_url': 'http://{}{}'.format(host, reverse('paypal-ipn')),
-            'return_url': 'http://{}{}'.format(host, reverse('payment_done')),
-            'cancel_return': 'http://{}{}'.format(host, reverse('payment_cancelled')),
-        }
-        form = PayPalPaymentsForm(initial=paypal_dict)
-        address = UserAddressBook.objects.filter(user=request.user, status=True).first()
-        return render(request, 'checkout.html',
-                      {'cart_data': request.session['cartdata'], 'totalitems': len(request.session['cartdata']),
-                       'total_amt': total_amt, 'form': form, 'address': address})
+            order.save()
+            # End
+            for p_id, item in request.session['cart_data'].items():
+                # OrderItems
+                product = Product.objects.get(id=int(p_id))
+                size = Size.objects.filter(product=product).first()
+                size_quantity = size.quantity
+                items = OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=int(item['quantity']),
+                    total=int(item['quantity']) * int(item['final_price'])
+                )
+                items.save()
+                size.quantity = size_quantity - 1
+                size.save()
+
+            serializer = OrderDetailSerializer(Order.objects.get(id=order.id))
+            print(serializer.data)
+            return render(request, 'checkout.html', context={'data': serializer.data})
+    if request.method == 'GET':
+        return redirect('home')

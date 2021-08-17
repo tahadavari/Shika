@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% load product_extras %}
+{% block title %}{{ product.name }}{% endblock %}
 {% block main %}
     {% csrf_token %}
-
-    {#  product view  #}
+    {#      product view  #}
     <div class="container grid grid-cols-2 gap-6 mt-4">
-        {#  product image  #}
+        {#          product image  #}
         <div>
             <img id="ProductImage" src="{{ product_image_main.image.url }}" class="w-full">
             <div class="grid grid-cols-5 gap-4 mt-4">
@@ -14,8 +14,8 @@
                 {% endfor %}
             </div>
         </div>
-        {#  end product image  #}
-        {#  product content  #}
+        {#          end product image  #}
+        {#          product content  #}
         <div>
             <h2 class="text-3xl font-medium uppercase mb-2 ">{{ product.name }}</h2>
             <div class="flex items-center mb-4">
@@ -65,7 +65,7 @@
                             class="w-44 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
                         {% for size in product_sizes %}
                             {% if size.quantity != 0 %}
-                                <option>{{ size.size }}</option>
+                                <option value="{{ size.id }}">{{ size.size }}</option>
                             {% endif %}
                         {% endfor %}
 
@@ -82,8 +82,8 @@
 
             <div class="flex gap-3 border-b border-gray-200 pb-5 mt-6">
                 {% if product.availability %}
-                    <button id="AddToCartBtn"
-                            class="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition">
+                    <button id="AddToCartBtn" data-product="{{ product.id }}" data-action="add"
+                            class="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition update-cart">
                         <i class="fas fa-shopping-bag"></i> Add to cart
                     </button>
                 {% else %}
@@ -94,27 +94,30 @@
                 {% endif %}
             </div>
         </div>
-        {#  end product content  #}
+        {#          end product content  #}
 
     </div>
-    {#  end product view  #}
+    {#      end product view  #}
 
     <script>
         $('#AddToCartBtn').on('click', function () {
             let p_image = $('#ProductImage').attr('src')
             let p_quantity = $('#ProductQuantity').val()
             let p_id = $('#ProductId').val()
-            let p_size = $('#ProductSize option:selected').text()
+            let p_size = $('#ProductSize option:selected').val()
             let p_price = $('#ProductPrice').text()
             let p_final_price = $('#ProductFinalPrice').text()
             let p_name = $('#ProductName').val();
-
-            console.log(p_image, p_name, p_quantity, p_id, p_size, p_price)
+            let order = '{{ request.cart.id }}';
+            let total = p_quantity*p_final_price
+            console.log(p_size)
 
             $.ajax({
                 type: 'POST',
                 url: '{% url 'add_to_cart' %}',
                 data: {
+                    'total':total,
+                    'order': order,
                     'id': p_id,
                     'quantity': p_quantity,
                     'size': p_size,
@@ -125,8 +128,10 @@
                 },
                 success: function (response, status, xhr) {
                     $('#CartQuantity').text(response.total_item)
+                    $('#CartQuantity_auth').text(response.total_item)
                 }
             })
         })
     </script>
+
 {% endblock %}

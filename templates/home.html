@@ -53,7 +53,7 @@
             <div class="grid grid-cols-1 gap-3 mt-4">
                 <div class="relative rounded-sm overflow-hidden group">
                     <img src="{{ pcategory.image.url }}" class="w-full">
-                    <a href="#"
+                    <a href="{{ pcategory.get_url }}"
                        class="absolute inset-0 bg-primary bg-opacity-10 flex items-center justify-center text-xl text-white font-roboto font-madium group-hover:bg-opacity-50 transition">{{ pcategory.name }}</a>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                     {% if ccategory.parent == pcategory %}
                         <div class="relative rounded-sm overflow-hidden group">
                             <img src="{{ ccategory.image.url }}" class="w-full ">
-                            <a href="#"
+                            <a href="{{  ccategory.get_url }}"
                                class="absolute inset-0 bg-primary bg-opacity-10 flex items-center justify-center text-xl text-white font-roboto font-madium group-hover:bg-opacity-50 transition">{{ ccategory.name }}</a>
                         </div>
                     {% endif %}

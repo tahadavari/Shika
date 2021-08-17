@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% block title %}Profile{% endblock %}
+{% load product_extras %}
+{% block main %}
+    {#  account  #}
+    <div class="container grid grid-cols-12 items-start gap-6 pt-4 pb-16">
+        {#  sidebar  #}
+        <div class="col-span-3">
+            <div class="px-4 py-3 shadow flex items-center gap-4">
+                <div class="flex-shrink-0">
+                    <img src="/static/images/profile.png"
+                         class="rounded-full w-12 h-44 border border-gray-200 p-1 object-cover ">
+                </div>
+                <div class="flex-grow">
+                    <p class="text-gray-600">Hello,</p>
+                    <h4 class="text-gray-800 font-medium">
+                        {{ user.first_name }}
+                    </h4>
+
+                </div>
+            </div>
+        </div>
+
+        {#    links    #}
+        <div class="mt-6 bg-white shadow rounded p-4 divide-y divide-gray-200 space-y-4 text-gray-600">
+            <div onclick="personal_information_form()" id="PersonalInformation" class="space-y-1 pl-0 ">
+                <a href="#" class="text-primary block font-medium capitalize transition">
+                    <span class="flex-grow mr-4 top-0 text-base">
+                        <i class="fas fa-info"></i>
+                    </span>
+                    Personal Information
+                </a>
+            </div>
+            <div onclick="" id="My Order" class="space-y-1 pl-0 pt-4 ">
+                <a href="#" class="text-primary block font-medium capitalize transition">
+                    <span class="flex-grow mr-4 top-0 text-base">
+                        <i class="fas fa-shopping-basket"></i>
+                    </span>
+                    My Order
+                </a>
+            </div>
+            <div onclick="my_address()" id="MyAddress" class="space-y-1 pl-0 pt-4">
+                <a href="#" class=" text-primary block font-medium capitalize transition">
+                    <span class="flex-grow mr-4 top-0 text-base">
+                        <i class="fas fa-address-card"></i>
+                    </span>
+                    My Address
+                </a>
+            </div>
+            <div onclick="change_password_form()" id="ChangePassword" class="space-y-1 pl-0 pt-4">
+                <a href="#" class=" text-primary block font-medium capitalize transition">
+                    <span class="flex-grow mr-4 top-0 text-base">
+                        <i class="fas fa-key"></i>
+                    </span>
+                    Change password
+                </a>
+            </div>
+            <div class="space-y-1 pl-0 pt-4">
+                <a href="{% url 'logout' %}" class="text-primary block font-medium capitalize transition">
+                    <span class="flex-grow mr-4 top-0 text-base">
+                        <i class="fas fa-sign-out"></i>
+                    </span>
+                    Logout
+                </a>
+            </div>
+        </div>
+        {#    links end    #}
+        {#  sidebar end  #}
+        {#  main  #}
+        <div id="Profile">
+
+        </div>
+        {#  main end  #}
+    </div>
+    {#  account end  #}
+    <script>
+        function my_address() {
+            console.log('tets')
+            $.ajax({
+                type: 'GET',
+                url: '{% url 'address_view' %}',
+                success: function (response, status, xhr) {
+                    {#console.log(response)#}
+                    $('#Profile').html(response.html)
+                }
+            })
+        }
+
+        function delete_address(id) {
+            console.log("http://127.0.0.1:8000/address-delete/" + id)
+            $.ajax({
+                type: 'DELETE',
+                headers: {
+                    "X-CSRFTOKEN": "{{ csrf_token }}"
+                },
+                url: "http://127.0.0.1:8000/address-delete/" + id,
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (response, status, xhr) {
+                    {#console.log(response)#}
+                    my_address();
+                }
+            })
+        }
+
+        function new_address_form() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url 'address_new' %}',
+                success: function (response, status, xhr) {
+                    {#console.log(response)#}
+                    $('#Profile').html(response.html)
+                }
+            })
+        }
+
+        function add_new_address() {
+            let title = $('#AddressTitle').val()
+            let state = $('#AddressState').val()
+            let city = $('#AddressCity').val()
+            let no = $('#AddressNo').val()
+            let postal_code = $('#AddressPostalcode').val()
+            let address = $('#AddressAddress').val()
+            let customer_id = {{ request.customer.id }}
+                {#console.log(title,state,city,no,postal_code,address,customer_id)#}
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url 'address_new' %}',
+                    headers: {
+                        "X-CSRFTOKEN": "{{ csrf_token }}"
+                    },
+                    data: {
+                        'title': title,
+                        'customer': customer_id,
+                        'state': state,
+                        'city': city,
+                        'postal_code': postal_code,
+                        'no': no,
+                        'address': address,
+                    },
+                    success: function (response, status, xhr) {
+                        console.log(response)
+                        my_address();
+                    }
+                })
+        }
+
+        function edit_address(address_id) {
+            let title = $('#AddressTitle').val()
+            let state = $('#AddressState').val()
+            let city = $('#AddressCity').val()
+            let no = $('#AddressNo').val()
+            let postal_code = $('#AddressPostalcode').val()
+            let address = $('#AddressAddress').val()
+            let customer_id = {{ request.customer.id }};
+            console.log(title, state, city, no, postal_code, address, customer_id, address_id)
+            $.ajax({
+                type: 'PUT',
+                url: "http://127.0.0.1:8000/address-update/" + address_id,
+                headers: {
+                    "X-CSRFTOKEN": "{{ csrf_token }}"
+                },
+                data: {
+                    'id': address_id,
+                    'title': title,
+                    'customer': customer_id,
+                    'state': state,
+                    'city': city,
+                    'postal_code': postal_code,
+                    'no': no,
+                    'address': address,
+                },
+                success: function (response, status, xhr) {
+                    console.log(response)
+                    my_address();
+                }
+            })
+        }
+
+        function edit_address_form(address_id) {
+            $.ajax({
+                type: 'GET',
+                url: "http://127.0.0.1:8000/address-update/" + address_id,
+                success: function (response, status, xhr) {
+                    {#console.log(response)#}
+                    $('#Profile').html(response.html)
+                }
+            })
+        }
+
+        function personal_information_form() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url 'personal_information' %}',
+                success: function (response, status, xhr) {
+                    {#console.log(response)#}
+                    $('#Profile').html(response.html)
+                }
+            })
+        }
+
+        function change_password_form() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url 'change_password' %}',
+                success: function (response, status, xhr) {
+                    {#console.log(response)#}
+                    $('#Profile').html(response.html)
+                }
+            })
+        }
+
+        function confirm_password() {
+            let password = $('#Password').val()
+            let confirm = $('#ConfirmPassword').val()
+            if (confirm === password) {
+                $('#ConfirmPassword').css("color", "green");
+                $('#ConfirmPassword').css("border-color", "green");
+                return true
+            } else
+                return false
+        }
+
+        function edit_personal_information() {
+            if (confirm_password()) {
+                let username = '{{ user.username }}';
+                let first_name = $('#FirstName').val();
+                let last_name = $('#LastName').val();
+                let phone = $('#Phone').val();
+                let email = $('#Email').val();
+                {#console.log(username,first_name, last_name, phone, email, password)#}
+                $.ajax({
+                    type: 'PUT',
+                    url: '{% url 'personal_information' %}',
+                    headers: {
+                        "X-CSRFTOKEN": "{{ csrf_token }}"
+                    },
+                    data: {
+                        'username': username,
+                        'first_name': first_name,
+                        'last_name': last_name,
+                        'email': email,
+                        'phone': phone,
+                        'is_active': true,
+                    },
+                    success: function (response, status, xhr) {
+                        console.log(response)
+                        location.reload();
+                    }
+                })
+            }
+        }
+
+        function change_password() {
+            let passworrd = $('#Password').val();
+            let confirm = $('#ConfirmPassword').val()
+            let username = '{{ user }}';
+            let phone = '{{ request.customer.phone }}';
+            console.log(username,phone)
+            if (confirm_password() && passworrd && confirm) {
+                $.ajax({
+                    type: 'PUT',
+                    url: '{% url 'change_password' %}',
+                    headers: {
+                        "X-CSRFTOKEN": "{{ csrf_token }}"
+                    },
+                    data: {
+                        'username':username,
+                        'phone':phone,
+                        'password': passworrd,
+                        'is_active': true,
+                    },
+                    success: function (response, status, xhr) {
+                        console.log(response)
+                        location.reload();
+                    }
+                })
+            }
+        }
+
+    </script>
+
+{% endblock %}

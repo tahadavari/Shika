@@ -1,11 +1,13 @@
 import datetime
-
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils import timezone
 
-
 # Create your models here.
+
+
+
 class BaseManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False)
@@ -27,4 +29,13 @@ class BaseModel(models.Model):
 
 
 class User(AbstractUser):
+    pass
+
+
+# class for test abstract class (BaseModel & User)
+class TestBaseModel(BaseModel):
+    pass
+
+
+class TestUserModel(User):
     pass

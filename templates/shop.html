@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}Shop{% endblock %}
 {% block main %}
     {#  shop  #}
     <div class="container grid grid-cols-4 gap-6 pt-4 pb-16 items-start">
@@ -41,11 +42,11 @@
                     <h3 class="text-xl text-gray-800 mb-3 uppercase font-medium">size</h3>
                 </div>
                 <select class="w-44 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
-                    <option>Most Visited</option>
-                    <option>Most Sales</option>
-                    <option>Latest Product</option>
-                    <option>Price Low-High</option>
-                    <option>Price High-Low</option>
+                    <option>42</option>
+                    <option>36</option>
+                    <option>43</option>
+                    <option>35</option>
+                    <option>41</option>
                 </select>
             </div>
             {#  size filter end  #}
@@ -53,19 +54,25 @@
         {#  sidebar end  #}
         {#  product  #}
         {#  sorting  #}
-        <select class="w-44 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
-            <option>Most Visited</option>
-            <option>Most Sales</option>
-            <option>Latest Product</option>
-            <option>Price Low-High</option>
-            <option>Price High-Low</option>
-        </select>
-        {#  sorting end  #}
-        {#  product grid  #}
-        <div class="grid grid-cols-3 gap-6">
-
+        <div class="col-span-3">
+        <div class="flex items-center mb-4">
+            <select class="w-44 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
+                <option>Most Visited</option>
+                <option>Most Sales</option>
+                <option>Latest Product</option>
+                <option>Price Low-High</option>
+                <option>Price High-Low</option>
+            </select>
         </div>
-        {#  product grid end  #}
+            {#  sorting end  #}
+            {#  product grid  #}
+            <div class="grid grid-cols-3 gap-6">
+                {% for product in products %}
+                    {% include 'product_card_category.html' %}
+                {% endfor %}
+            </div>
+            {#  product grid end  #}
+        </div>
     </div>
     {#  shop end #}
     <script>

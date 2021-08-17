@@ -1,0 +1,26 @@
+{% load product_extras %}
+<div class="container">
+    <a href="{% url 'product_detail' product.id %}">
+        <div class="max-w-xs w-full bg-primary shadow-lg rounded-xl p-6">
+            <div class="flex flex-col ">
+                <div class="">
+                    <div class="relative h-62 w-full mb-3">
+                        <img src="{{ product.main_image.image.url }}"
+                             class=" w-full   object-fill  rounded-2xl">
+                    </div>
+                    <div class="flex-auto justify-evenly">
+                        <div class="flex flex-wrap ">
+                            <div class="text-center flex items-center w-full justify-center min-w-0 text-xl text-gray-200 truncate">
+                                {{ product.name }}
+                            </div>
+                        </div>
+                        <div class="text-md text-center text-white font-semibold mt-1 justify-center">
+                            {{ product.final_price }} $
+                             <p class="text-base text-gray-400 line-through ">{{ product.price }} $</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>

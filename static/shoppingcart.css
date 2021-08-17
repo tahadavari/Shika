@@ -14,18 +14,20 @@ body {
     font-family: 'Roboto', sans-serif;
 
 }
-.checkout-btn{
+
+.checkout-btn {
     width: 83px;
     padding-top: 27px;
     text-align: center;
     font-size: 16px;
     color: #43484D;
     font-weight: 300;
-    background:none;
+    background: none;
 
 }
-.Checkout
-{
+
+
+.Checkout {
     width: 750px;
     height: 200px;
     margin: 80px auto;
@@ -36,9 +38,10 @@ body {
     display: flex;
     flex-direction: column;
 }
+
 .shopping-cart {
     width: 750px;
-    height: 423px;
+    height: auto;
     margin: 80px auto;
     background: #FFFFFF;
     box-shadow: 1px 2px 3px 0px rgba(0, 0, 0, 0.10);
@@ -70,9 +73,9 @@ body {
 
 /* Buttons -  Delete and Like */
 .buttons {
-    position: relative;
-    padding-top: 30px;
-    margin-right: 60px;
+    /*position: relative;*/
+    /*padding-top: 30px;*/
+    /*margin-right: 60px;*/
 }
 
 .delete-btn {
@@ -164,12 +167,12 @@ body {
 }
 
 button[class*=btn] {
-    width: 30px;
-    height: 30px;
-    background-color: #E1E8EE;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
+    /*width: 30px;*/
+    /*height: 30px;*/
+    /*background-color: #E1E8EE;*/
+    /*border-radius: 6px;*/
+    /*border: none;*/
+    /*cursor: pointer;*/
 }
 
 .minus-btn img {
@@ -186,10 +189,11 @@ input:focus {
 }
 
 /* Total Price */
-.price{
+.price {
     text-decoration: line-through;
 }
-.price,.final-price,.total-price {
+
+.price, .final-price, .total-price {
     width: 83px;
     padding-top: 27px;
     text-align: center;

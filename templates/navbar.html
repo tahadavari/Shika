@@ -54,7 +54,7 @@
                 for (let parent_category of category_list) {
                     let a_tag = document.createElement("a")
                     a_tag.className = "px-6 py-3 flex items-center hover:bg-gray-100 transition group"
-                    a_tag.setAttribute("href", "#")
+                    a_tag.setAttribute("href", parent_category.get_url)
 
                     let img_tag = document.createElement('img')
                     img_tag.className = "w-5 h-5 abject-contain"
@@ -70,7 +70,7 @@
 
                     if (parent_category.subcategories !== []) {
                         var ul_tag = document.createElement('ul')
-                        ul_tag.className = "list-disc items-center"
+                        ul_tag.className = "list items-center"
                     }
                     for (let sub_category of parent_category.subcategories) {
 
@@ -79,7 +79,7 @@
 
                         let sub_a_tag = document.createElement("a")
                         sub_a_tag.className = "px-6 py-3 flex items-center hover:bg-gray-100 transition group"
-                        sub_a_tag.setAttribute("href", "#")
+                        sub_a_tag.setAttribute("href",sub_category.get_url )
 
                         let sub_img_tag = document.createElement('img')
                         sub_img_tag.className = "w-5 h-5 abject-contain"

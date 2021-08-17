@@ -1,7 +1,49 @@
 {% extends 'base.html' %}
 {% block title %}Cart{% endblock %}
 {% block extrahead %}
-    <link rel="stylesheet" href="/static/cart.css">
+    <link rel="stylesheet" href="/static/shoppingcart.css">
+    <style>
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+
+        body.modal-active {
+            overflow-x: hidden;
+            overflow-y: visible !important;
+        }
+    </style>
+{% endblock %}
+{% block header %}
+    <header class="py-4 shadow-sm bg-white">
+    <div class="container flex item-center justify-between">
+        {#    logo     #}
+        <a href="#">
+            <img src="/static/logo/bc60cf05.svg" class="w-32">
+        </a>
+        {#    search box   #}
+        <div class="w-full max-w-xl relative flex">
+            <span class="absolute left-4 top-3 text-lg text-gray-400">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text"
+                   class="w-full border border-primary border-r-0 pl-12 py-3 pr-3 rounded-l-md focus:outline-none"
+                   placeholder="search">
+            <button class="items-center flex bg-primary border border-primary text-white px-8 rounded-r-md hover:bg-transparent hover:text-primary transition">
+                Search
+            </button>
+        </div>
+        {#    icons    #}
+        <div class="flex items-center space-x-4">
+            <a href="{% url 'profile' %}" class="text-center text-gray-700 hover:text-primary transition relative">
+                <div class="text-2xl">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="text-xs leading-3">Account</div>
+            </a>
+        </div>
+    </div>
+
+</header>
 {% endblock %}
 {% block main %}
     <div id="CartList">
@@ -9,93 +51,148 @@
             <!-- Title -->
             <div class="title flex items-center justify-between">
                 <div class="uppercase">Shopping Cart</div>
-                <div>{{ total_item }}</div>
+                <div>{{ request.cart.get_count }}</div>
             </div>
 
-            {% for product_id,item in cart_data.items %}
+            {% for order_item in request.cart.items.all %}
                 <div class="item">
-                    <div class="buttons">
-                        <span class="delete-btn" data-item="{{ product_id }}"></span>
+                    <div onclick="delete_item({{ order_item.id }})" class="buttons">
+                        <span class="delete-btn"></span>
                     </div>
 
                     <div class="image w-16">
-                        <img id="ProductImage-{{ product_id }}" src="{{ item.main_image }}" alt=""/>
+                        <img id="ProductImage-{{ order_item.id }}" src="{{ order_item.product.main_image.image.url }}"
+                             alt=""/>
                     </div>
 
                     <div class="description">
-                        <span id="ProductName-{{ product_id }}">{{ item.name }}</span>
-                        <span id="ProductSize-{{ product_id }}">{{ item.size }}</span>
+                        <span id="ProductName-{{ order_item.id }}">{{ order_item.product.name }}</span>
+                        <span id="ProductSize-{{ order_item.id }}">{{ order_item.size.size }}</span>
                         <span>Size</span>
                     </div>
 
                     <div class="quantity">
-                        <input id='ProductQuantity-{{ product_id }}' data-item="{{ product_id }}" class='qty-input'
+                        <input id='ProductQuantity-{{ order_item.id }}' data-item="{{ order_item.id }}"
+                               class='qty-input'
                                type="number" name="name"
-                               value="{{ item.quantity }}"
+                               value="{{ order_item.quantity }}"
                                min="1">
                     </div>
-                    {% if item.price != "" %}
-                        <div id="ProductPrice-{{ product_id }}" class="price">{{ item.price }}</div>
+                    {% if order_item.product.price == order_item.product.final_price %}
+                        <div id="ProductPrice-{{ order_item.id }}"
+                             class="final-price">{{ order_item.product.final_price }}</div>
                     {% else %}
-                        <div id="ProductPrice-{{ product_id }}" class="final-price">{{ item.final_price }}</div>
+                        <div id="ProductPrice-{{ order_item.id }}" class="price">{{ order_item.product.price }}</div>
                     {% endif %}
-                    <div id="ProductFinalPrice-{{ product_id }}" class="final-price">{{ item.final_price }}</div>
-                    <div id="ProductFinalPrice-{{ product_id }}"
-                         class="total-price">{% widthratio item.final_price 1 item.quantity %}</div>
+                    <div id="ProductFinalPrice-{{ order_item.id }}"
+                         class="final-price">{{ order_item.product.final_price }}</div>
+                    <div id="ProductFinalPrice-{{ order_item.id }}"
+                         class="total-price">{% widthratio order_item.product.final_price 1 order_item.quantity %}</div>
                 </div>
             {% endfor %}
         </div>
-        <div class="Checkout flex   justify-center">
+        <div class="Checkout flex  justify-center">
             <!-- Title -->
             <div class="title">
                 Checkout
             </div>
 
             <!-- Product #1 -->
-            <div class="item">
+            <div class="item justify-between">
 
-                <div class="price">{{ total_amount }}</div>
-                <div class="final-price">{{ total_final_amount }}</div>
+                <div class="price">{{ request.cart.calculate_total }}</div>
+                <div class="final-price">{{ request.cart.calculate_total_finaly }}</div>
 
+
+                <select id="OrderAddress"
+                        class="w-32 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
+                    {% for address in request.cart.customer.addresses.all %}
+                        <option value="{{ address.id }}">{{ address.title }}</option>
+                    {% endfor %}
+
+                </select>
             </div>
-            <button class="items-center bg-primary text-white h-24 rounded-sm">Checkout</button>
+            <button id="CheckOutBtn"
+                    class="hover:bg-transparent text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary transition uppercase text-sm">
+                Checkout
+            </button>
+
+
+        </div>
+        <div class="max-w-xl bg-white  mx-auto shadow px-6 py-7 mb-6 rounded overflow-hidden">
+            <div class="flex justify-between">
+                <h4 class="text-lg font-medium capitalize mb-4">New Address</h4>
+            </div>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="" class="text-gray-600 mb-2 block">Title</label>
+                        <input id="AddressTitle" type="text"
+                               class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+                    </div>
+
+                    <div>
+                        <label for="" class="text-gray-600 mb-2 block">State</label>
+                        <input id="AddressState" type="text"
+                               class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="" class="text-gray-600 mb-2 block">City</label>
+                        <input id="AddressCity" type="text"
+                               class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+                    </div>
+
+                    <div>
+                        <label for="" class="text-gray-600 mb-2 block">No</label>
+                        <input id="AddressNo" type="text"
+                               class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="" class="text-gray-600 mb-2 block">Postal code</label>
+                        <input id="AddressPostalcode" type="text"
+                               class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+                    </div>
+
+                    <div>
+                        <label for="" class="text-gray-600 mb-2 block">Address</label>
+                        <input id="AddressAddress" type="text"
+                               class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button onclick="add_new_address()"
+                        class="hover:bg-transparent text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary transition uppercase text-sm">
+                    save new address
+                </button>
+            </div>
         </div>
     </div>
+
     <script>
-        $(document).on('click', '.delete-btn', function () {
-            if (confirm('Are you sure to delete this product?')) {
-                let p_id = $(this).attr('data-item')
 
-                $.ajax({
-                    type: 'POST',
-                    url: '{% url 'delete_from_cart' %}',
-                    data: {
-                        'id': p_id,
-                    },
-                    success: function (response, status, xhr) {
-                        $('#CartList').html(response.data)
-                        $("#CartQuantity").text(response.total_item);
-                    }
-                })
-            }
-
-        })
-
-        $(document).on('click', '.qty-input', function () {
-            let p_id = $(this).attr('data-item')
-            let p_quantity = $(this).val()
+        function delete_item(order_id) {
+            console.log(order_id)
             $.ajax({
                 type: 'POST',
-                url: '{% url 'update_to_cart' %}',
+                url: '{% url 'delete_from_cart' %}',
+                headers: {
+                    "X-CSRFTOKEN": "{{ csrf_token }}"
+                },
                 data: {
-                    'id': p_id,
-                    'quantity': p_quantity,
+                    'id': order_id,
                 },
                 success: function (response, status, xhr) {
-                    console.log(response.data)
-                    $('#CartList').html(response.data)
+                    $('#CartList').html(response.html)
                 }
             })
-        })
+        }
+
     </script>
+
+
 {% endblock %}

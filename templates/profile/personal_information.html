@@ -1,0 +1,50 @@
+<div class="col-span-9 shadow rounded px-6 pt-5 pb-7 p-4">
+    <h4 class="text-lg font-medium capitalize mb-4">Personal information</h4>
+    <div class="space-y-4">
+{#        <div class="grid grid-cols-2 gap-4">#}
+{#            <div>#}
+{#                <label for="" class="text-gray-600 mb-2 block">New password</label>#}
+{#                <input id="Password" type="password"#}
+{#                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">#}
+{#            </div>#}
+{##}
+{#            <div>#}
+{#                <label for="" class="text-gray-600 mb-2 block">Confirm password</label>#}
+{#                <input id="ConfirmPassword" oninput="confirm_password()" type="password"#}
+{#                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">#}
+{#            </div>#}
+{#        </div>#}
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">First Name</label>
+                <input id="FirstName" value="{{ user.first_name }}" type="text"
+                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+            </div>
+
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">Last Name</label>
+                <input id="LastName" value="{{ user.last_name }}" type="text"
+                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">Email</label>
+                <input id="Email" value="{{ user.email }}" type="email"
+                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+            </div>
+
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">Phone</label>
+                <input id="Phone" value="{{ customer.phone }}" type="text"
+                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <button onclick="edit_personal_information()"
+                class="hover:bg-transparent text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary transition uppercase text-sm">
+            save changes
+        </button>
+    </div>
+</div>

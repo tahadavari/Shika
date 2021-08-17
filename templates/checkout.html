@@ -1,0 +1,14 @@
+<div class="items-center">
+    <ul>
+        {% for d in data.values %}
+            <li class="items-center text-white">
+                {{ d }}
+            </li>
+        {% endfor %}
+
+    </ul>
+
+    <button >
+        <a href="{% url 'home' %}">Home</a>
+    </button>
+</div>

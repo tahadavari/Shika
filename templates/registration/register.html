@@ -1,32 +1,35 @@
 {% extends 'base.html' %}
+{% block extrahead %}
+    <style>
+    [id^='id_']{
+        border-radius: 1px;
+        width: 100%;
+    }
+    </style>
+{% endblock %}
 {% block main %}
     {# Login #}
     <div class="container py-16">
         <div class="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
             <h2 class="text-2xl uppercase font-medium mb-1">register</h2>
-            <p class="text-gray-600 mb-6 text-sm">lorem ipusem kmdklmcklsadml</p>
+            <p class="text-gray-600 mb-6 text-sm">Welcome to SHIKA shoes shop</p>
             <form method="post">
                 <div class="space-y-4">
                     {% csrf_token %}
-                    {#                    <div>#}
-                    {#                        <label for="first_name" class="text-gray-600 mb-2 block">First Name</label>#}
-                    {#                        <input id="first_name" type="text"#}
-                    {#                               class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded focus:border-primary focus:ring-0 placeholder-gray-400"#}
-                    {#                               placeholder="Enter your First Name">#}
-                    {#                    </div>#}
                     {% for field in form %}
                         <p>
+                        {{ field.id }}
                             {{ field.label_tag }}<br>
                             {{ field }}
-                            {% if field.help_text %}
-                                <small style="color: grey">{{ field.help_text }}</small>
-                            {% endif %}
                             {% for error in field.errors %}
                                 <p style="color: red">{{ error }}</p>
                             {% endfor %}
                         </p>
                     {% endfor %}
-                    <button type="submit">Sign up</button>
+                   <button type="submit"
+                        class="py-2 block w-full bg-primary border border-primary text-white px-8 rounded hover:bg-transparent hover:text-primary transition font-medium font-roboto">
+                    Sing in
+                </button>
                 </div>
             </form>
             <div class="mt-6 flex justify-center relative">

@@ -1,0 +1,10 @@
+<div class="block items-center">
+    <span class="text-white">Address</span>
+    <select id='ChoiceAddress'class="mt-2 items-center">
+        {% for address in data %}
+           <option value="{{ address.id }}">
+           {{ address.title }}
+           </option>
+        {% endfor %}
+    </select>
+</div>

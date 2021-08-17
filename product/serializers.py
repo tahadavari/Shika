@@ -26,10 +26,13 @@ class ProductImageSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductDetailSerializer(serializers.ModelSerializer):
+     # main_image = serializers.RelatedField(many=True, read_only=True)
+
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = ['id', 'name', 'price', 'view', 'material', 'features',
+                  'specialized_features', 'score', 'brand', 'category', 'final_price', 'main_image', 'images']
         read_only_fields = ['id']
 
 
@@ -65,6 +68,7 @@ class CategorySerializer(serializers.ModelSerializer):
             'id',
             'product_count',
             'subcategories',
+            'get_url'
         ]
 
     def get_product_count(self, obj):

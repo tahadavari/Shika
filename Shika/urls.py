@@ -23,9 +23,8 @@ import product.urls
 from Shika import settings
 
 from core.views import home
-from customer.views import AddressDetailAPI, AddressListAPI, CustomerDetailAPI, CustomerListAPI
 from order.views import cart
-from product.views import product_api, ProductList, ProductDetail
+from product.views import product_api, ProductList, ProductDetail, category
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
@@ -36,9 +35,6 @@ urlpatterns = [
                   path('order/', include(order.urls)),
                   path('productlist/', ProductList.as_view()),
                   path('productdetail/<int:pk>', ProductDetail.as_view()),
-                  path('customerlist/', CustomerListAPI.as_view()),
-                  path('customerdetail/', CustomerDetailAPI.as_view()),
-                  path('addresslist/', AddressListAPI.as_view()),
-                  path('addressdetail/<int:pk>', AddressDetailAPI.as_view()),
-                  path('cart', cart, name='cart')
+                  path('cart', cart, name='cart'),
+                  path('shop/<str:pk>', category, name='category'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

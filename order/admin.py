@@ -10,4 +10,4 @@ class InLineOrderItem(admin.StackedInline):
     extra = 1
 
 
-admin.site.register(Order)
+admin.site.register([Order, OrderItem])

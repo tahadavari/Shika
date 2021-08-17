@@ -1,0 +1,53 @@
+<div class="col-span-9 shadow rounded px-6 pt-5 pb-7 p-4">
+    <div class="flex justify-between">
+        <h4 class="text-lg font-medium capitalize mb-4">New Address</h4>
+        <i onclick="my_address()" class="fas fa-arrow-left hover:text-primary"></i>
+    </div>
+    <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">Title</label>
+                <input id="AddressTitle" type="text"
+                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+            </div>
+
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">State</label>
+                <input id="AddressState" type="text"
+                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">City</label>
+                <input id="AddressCity" type="text"
+                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+            </div>
+
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">No</label>
+                <input id="AddressNo" type="text"
+                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">Postal code</label>
+                <input id="AddressPostalcode" type="text"
+                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+            </div>
+
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">Address</label>
+                <input id="AddressAddress" type="text"
+                       class="block w-full border border-gray-300 px-4 py-3 text-gray-600 text-sm rounded placeholder-gray-400 focus:border-primary focus:ring-0">
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <button onclick="add_new_address()"
+                class="hover:bg-transparent text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary transition uppercase text-sm">
+            save new address
+        </button>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 from django.db import models
 # Create your models here.
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse
 
 from core.models import BaseModel
@@ -30,6 +30,9 @@ class Category(BaseModel):
         for i in self.subcategory.all():
             product_parent += len(i.categories.all())
         return product_sub + product_parent
+
+    def get_url(self):
+        return reverse('category', args=(self.pk,))
 
 
 class Discount(BaseModel):
@@ -71,24 +74,30 @@ class Product(BaseModel):
 
     def final_price(self):
         if self.discount:
-            if self.discount.percent :
+            if self.discount.type == 'PR':
                 dis = round((self.discount.percent * self.price) / 100)
-                if dis > self.discount.max_discount:
-                    return self.price - 50
-                return self.price - dis
-            elif self.discount.amount != 0:
+                if self.discount.max_discount:
+                    if dis > self.discount.max_discount:
+                        return self.price - self.discount.max_discount
+                    return self.price - dis
+                return self.price-dis
+            elif self.discount.type == 'AM':
                 return self.price - self.discount.amount
         else:
             return self.price
 
-    def main_image_url(self):
+    def main_image(self):
         return self.images.filter(main=True).first()
 
     def availability(self):
         if len(self.sizes.all().filter(quantity__gt=0)):
-            return True
+            count = 0
+            for i in self.sizes.all().filter(quantity__gt=0):
+                count+=i.quantity
+            return count
         else:
             return False
+
 
 
 class ProductImage(BaseModel):
@@ -106,7 +115,7 @@ class ProductImage(BaseModel):
 class Size(BaseModel):
     size = models.IntegerField(verbose_name=_('Size'))
     quantity = models.IntegerField(verbose_name=_('Quantity'))
-    product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='sizes')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sizes')
 
     def __str__(self):
         return f'{self.product.name} : {self.size}'

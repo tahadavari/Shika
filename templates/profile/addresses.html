@@ -1,0 +1,26 @@
+<div class="col-span-9 grid-cols-3 gap-4">
+    {% for address in data %}
+        <div class="shadow rounded bg-white px-4 pb-6">
+            <div class="flex  justify-between items-center mt-4">
+                <h3 class="font-medium text-gray-800 text-lg ">{{ address.title }}</h3>
+                <a onclick="edit_address_form({{ address.id }})" href="#" class="text-primary">Edit</a>
+            </div>
+            <div class="space-y-1 ">
+                <h4 class="text-gray-700 font-medium">{{ address.postal_code }}</h4>
+                <p class="text-gray-800">{{ address.city }}</p>
+                <p class="text-gray-800">{{ address.state }}</p>
+                <p class="text-gray-800">{{ address.no }}</p>
+                <p class="text-gray-800">{{ address.address }}</p>
+            </div>
+            <div class="flex  justify-between items-center mt-4">
+                <a onclick="delete_address({{ address.id }})" href="#" style="color: red">Delete</a>
+            </div>
+        </div>
+    {% endfor %}
+    <div class="mt-4">
+        <button onclick="new_address_form()"
+                class="text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary hover:bg-transparent transition uppercase text-sm">
+            add new address
+        </button>
+    </div>
+</div>

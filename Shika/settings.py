@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'core',
     'product',
     'customer',
-    'order'
+    'order',
+    'cart'
 ]
 
 LOGIN_URL = '/login'
@@ -55,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'cart.middleware.CartMiddleware',
+    'customer.middleware.CustomerMiddleware'
 ]
 
 ROOT_URLCONF = 'Shika.urls'
@@ -145,3 +148,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'core.User'
+
+CART_SESSION_ID = 'cart_data'

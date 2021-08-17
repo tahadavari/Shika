@@ -30,7 +30,7 @@ class AddressDetailSerializer(serializers.ModelSerializer):
 class AddressListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = '__all__'
+        fields = ['id', 'title', 'state', 'city', 'address', 'postal_code', 'no', 'customer']
         read_only_fields = ['id']
 
 
