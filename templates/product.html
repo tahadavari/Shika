@@ -109,14 +109,17 @@
             let p_final_price = $('#ProductFinalPrice').text()
             let p_name = $('#ProductName').val();
             let order = '{{ request.cart.id }}';
-            let total = p_quantity*p_final_price
+            let total = p_quantity * p_final_price
             console.log(p_size)
 
             $.ajax({
                 type: 'POST',
                 url: '{% url 'add_to_cart' %}',
+                headers: {
+                    "X-CSRFTOKEN": "{{ csrf_token }}"
+                },
                 data: {
-                    'total':total,
+                    'total': total,
                     'order': order,
                     'id': p_id,
                     'quantity': p_quantity,

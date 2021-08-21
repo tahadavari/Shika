@@ -22,7 +22,7 @@ class Order(BaseModel):
     def calculate_total_finaly(self):
         finaly_total = 0
         for item in self.items.all():
-            finaly_total += (item.product.final_price()*item.quantity)
+            finaly_total += (item.product.final_price() * item.quantity)
         return finaly_total
 
     def calculate_total(self):

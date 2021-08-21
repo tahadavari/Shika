@@ -1,0 +1,17 @@
+<div class="col-span-9 grid-cols-3 gap-4">
+    {% for order in data %}
+        <div class="shadow rounded bg-white px-4 pb-6">
+            <div class="flex  justify-between items-center mt-4">
+                <h3 class="font-medium text-gray-800 text-lg ">Complete Order</h3>
+                <a onclick="my_order_detail({{ order.id }})" href="#" class="text-primary">View</a>
+            </div>
+            <div class="space-y-1 ">
+                <h4 class="text-gray-700 font-medium">{{ order.address.title }}</h4>
+                {% for order_item in order.items %}
+                    <p class="text-gray-800">{{ order_item }}</p>
+                {% endfor %}
+                <p class="text-gray-800">{{ order.total_amount }}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>

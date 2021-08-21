@@ -15,35 +15,35 @@
 {% endblock %}
 {% block header %}
     <header class="py-4 shadow-sm bg-white">
-    <div class="container flex item-center justify-between">
-        {#    logo     #}
-        <a href="#">
-            <img src="/static/logo/bc60cf05.svg" class="w-32">
-        </a>
-        {#    search box   #}
-        <div class="w-full max-w-xl relative flex">
+        <div class="container flex item-center justify-between">
+            {#    logo     #}
+            <a href="#">
+                <img src="/static/logo/bc60cf05.svg" class="w-32">
+            </a>
+            {#    search box   #}
+            <div class="w-full max-w-xl relative flex">
             <span class="absolute left-4 top-3 text-lg text-gray-400">
                 <i class="fas fa-search"></i>
             </span>
-            <input type="text"
-                   class="w-full border border-primary border-r-0 pl-12 py-3 pr-3 rounded-l-md focus:outline-none"
-                   placeholder="search">
-            <button class="items-center flex bg-primary border border-primary text-white px-8 rounded-r-md hover:bg-transparent hover:text-primary transition">
-                Search
-            </button>
+                <input type="text"
+                       class="w-full border border-primary border-r-0 pl-12 py-3 pr-3 rounded-l-md focus:outline-none"
+                       placeholder="search">
+                <button class="items-center flex bg-primary border border-primary text-white px-8 rounded-r-md hover:bg-transparent hover:text-primary transition">
+                    Search
+                </button>
+            </div>
+            {#    icons    #}
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'profile' %}" class="text-center text-gray-700 hover:text-primary transition relative">
+                    <div class="text-2xl">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="text-xs leading-3">Account</div>
+                </a>
+            </div>
         </div>
-        {#    icons    #}
-        <div class="flex items-center space-x-4">
-            <a href="{% url 'profile' %}" class="text-center text-gray-700 hover:text-primary transition relative">
-                <div class="text-2xl">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="text-xs leading-3">Account</div>
-            </a>
-        </div>
-    </div>
 
-</header>
+    </header>
 {% endblock %}
 {% block main %}
     <div id="CartList">
@@ -72,7 +72,8 @@
                     </div>
 
                     <div class="quantity">
-                        <input id='ProductQuantity-{{ order_item.id }}' data-item="{{ order_item.id }}"
+                        <input oninput="update_item({{ order_item.id }})" id='ProductQuantity-{{ order_item.id }}'
+                               data-item="{{ order_item.id }}"
                                class='qty-input'
                                type="number" name="name"
                                value="{{ order_item.quantity }}"
@@ -106,17 +107,19 @@
 
                 <select id="OrderAddress"
                         class="w-32 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
+                    <option value="" disabled selected>Your Address</option>
                     {% for address in request.cart.customer.addresses.all %}
                         <option value="{{ address.id }}">{{ address.title }}</option>
                     {% endfor %}
 
                 </select>
             </div>
-            <button id="CheckOutBtn"
-                    class="hover:bg-transparent text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary transition uppercase text-sm">
-                Checkout
-            </button>
-
+            {% if request.cart.get_count != 0 and request.cart %}
+                <button onclick="check_out({{ address.id }})" id="CheckOutBtn"
+                        class="hover:bg-transparent text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary transition uppercase text-sm">
+                    Checkout
+                </button>
+            {% endif %}
 
         </div>
         <div class="max-w-xl bg-white  mx-auto shadow px-6 py-7 mb-6 rounded overflow-hidden">
@@ -190,6 +193,78 @@
                     $('#CartList').html(response.html)
                 }
             })
+        }
+
+        function update_item(id) {
+            let order_id = id;
+            let quantity = $('#ProductQuantity-' + order_id).val();
+            console.log(quantity)
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'update_to_cart' %}',
+                headers: {
+                    "X-CSRFTOKEN": "{{ csrf_token }}"
+                },
+                data: {
+                    'id': order_id,
+                    'quantity': quantity
+                },
+                success: function (response, status, xhr) {
+                    $('#CartList').html(response.html)
+                }
+            })
+
+
+        }
+
+        function add_new_address() {
+            let title = $('#AddressTitle').val()
+            let state = $('#AddressState').val()
+            let city = $('#AddressCity').val()
+            let no = $('#AddressNo').val()
+            let postal_code = $('#AddressPostalcode').val()
+            let address = $('#AddressAddress').val()
+            let customer_id = {{ request.customer.id }};
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'address_new_cart' %}',
+                headers: {
+                    "X-CSRFTOKEN": "{{ csrf_token }}"
+                },
+                data: {
+                    'title': title,
+                    'customer': customer_id,
+                    'state': state,
+                    'city': city,
+                    'postal_code': postal_code,
+                    'no': no,
+                    'address': address,
+                },
+                success: function (response, status, xhr) {
+                    $('#CartList').html(response.html)
+                }
+            })
+        }
+
+        function check_out(id) {
+            let order_id = id
+            let address_id = $("#OrderAddress option:selected").val();
+            if (address_id) {
+
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url 'check_out' %}',
+                    headers: {
+                        "X-CSRFTOKEN": "{{ csrf_token }}"
+                    },
+                    data: {
+                        'address': address_id
+                    },
+                    success: function (response, status, xhr) {
+                        $('#CartList').html(response.html)
+                    }
+                })
+            }
         }
 
     </script>

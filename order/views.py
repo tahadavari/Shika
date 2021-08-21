@@ -15,7 +15,7 @@ from order.serializers import OrderDetailSerializer, OrderItemSerializer
 from product.models import Product, Size
 
 
-@csrf_exempt
+@login_required()
 def add_to_cart(request):
     product_cart = {}
     product_cart[request.POST['id']] = {
@@ -26,25 +26,32 @@ def add_to_cart(request):
         'total': request.POST['total']
     }
     if request.user.is_authenticated:
-        if request.cart:
-            product_cart['order'] = request.cart.id
-            order_item = OrderItemSerializer(data=product_cart[request.POST['id']])
+        if not request.cart:
+            print('if not')
+            order = Order.objects.create(
+                customer=request.customer,
+                status='PE'
+            )
+            order.save()
+            request.cart = order
+        product_cart[request.POST['id']]['order'] = request.cart.id
+        order_item = OrderItemSerializer(data=product_cart[request.POST['id']])
 
-            if order_item.is_valid():
-                if int(request.POST['id']) in request.cart.get_products_id():
-                    pre_order_item = request.cart.items.get(product_id=int(request.POST['id']))
-                    pre_order_item.quantity = int(product_cart[request.POST['id']]['quantity'])
-                    pre_order_item.total = int(product_cart[request.POST['id']]['quantity']) * int(
-                        product_cart[request.POST['id']]['total'])
-                    pre_order_item.save()
-                    print(pre_order_item.quantity)
-                else:
-                    order_item.save()
+        if order_item.is_valid():
+            if int(request.POST['id']) in request.cart.get_products_id():
+                pre_order_item = request.cart.items.get(product_id=int(request.POST['id']))
+                pre_order_item.quantity = int(product_cart[request.POST['id']]['quantity'])
+                pre_order_item.total = int(product_cart[request.POST['id']]['quantity']) * int(
+                    product_cart[request.POST['id']]['total'])
+                pre_order_item.save()
+                print(pre_order_item.quantity)
             else:
-                print(order_item.errors)
-            # print(*request.cart.items.all())
-            print(request.cart.get_count())
-            return JsonResponse({'success': 'done', 'total_item': request.cart.get_count()})
+                order_item.save()
+        else:
+            print('51:', order_item.errors)
+        # print(*request.cart.items.all())
+        print(request.cart.get_count())
+        return JsonResponse({'success': 'done', 'total_item': request.cart.get_count()})
     else:
         if "cart_data" in request.session:
             if str(request.POST['id']) in request.session['cart_data']:
@@ -87,55 +94,45 @@ def delete_from_cart(request):
     return JsonResponse({'data': 'done', 'html': html})
 
 
-@csrf_exempt
+@login_required()
 def update_to_cart(request):
-    t = render_to_string('ajax/cart-list.html',
-                         {'cart_data': request.session['cart_data'], 'total_item': len(request.session['cart_data']),
-                          'total_amount': total_amount, 'total_final_amount': total_final_amount})
-    return JsonResponse({'data': t})
+    if request.method == 'POST':
+        order_item = request.cart.items.get(id=int(request.POST['id']))
+        order_item.quantity = int(request.POST['quantity'])
+        order_item.save()
+        html = render_to_string('ajax/cart-list.html', context={'request': request})
+        return JsonResponse({'data': 'done', 'html': html})
 
 
 @login_required
-@api_view(['GET', 'POST'])
-@csrf_exempt
-@renderer_classes([renderers.TemplateHTMLRenderer, renderers.JSONRenderer])
+@api_view(['POST'])
 def check_out(request):
-    total_amount = 0
-    item_total_amount = 0
     if request.method == 'POST':
-        if 'cart_data' in request.session:
-            for p_id, item in request.session['cart_data'].items():
-                total_amount += int(item['quantity']) * int(item['final_price'])
-                print(total_amount)
-            # Order
-            print(request.POST)
-            customer = Customer.objects.get(id=request.user.id)
-            address = Address.objects.get(id=int(request.POST['address']))
-            order = Order.objects.create(
-                customer=customer,
-                total_amount=total_amount,
-                address=address,
-                status='CO'
-            )
-            order.save()
-            # End
-            for p_id, item in request.session['cart_data'].items():
-                # OrderItems
-                product = Product.objects.get(id=int(p_id))
-                size = Size.objects.filter(product=product).first()
-                size_quantity = size.quantity
-                items = OrderItem.objects.create(
-                    order=order,
-                    product=product,
-                    quantity=int(item['quantity']),
-                    total=int(item['quantity']) * int(item['final_price'])
-                )
-                items.save()
-                size.quantity = size_quantity - 1
-                size.save()
+        order = request.cart
 
-            serializer = OrderDetailSerializer(Order.objects.get(id=order.id))
-            print(serializer.data)
-            return render(request, 'checkout.html', context={'data': serializer.data})
+        address = Address.objects.get(id=int(request.POST['address']))
+        order.address = address
+        order.total_amount = request.cart.calculate_total_finaly()
+        order.status = 'CO'
+
+        order.save()
+        html = render_to_string('receipt.html', context={'order': order})
+        return JsonResponse({'data': 'done', 'html': html})
+
+
+@login_required
+@api_view(['GET'])
+def my_order_list(request):
     if request.method == 'GET':
-        return redirect('home')
+        serializer = OrderDetailSerializer(Order.objects.filter(customer=request.user, status='CO'), many=True)
+        html = render_to_string(template_name='profile/my_order.html', context={'data': serializer.data})
+        return JsonResponse({'data': serializer.data, 'html': html})
+
+
+@login_required
+@api_view(['GET'])
+def my_order_detail(request,pk):
+    if request.method == 'GET':
+        order = Order.objects.get(id=pk)
+        html = render_to_string('profile/order_detail.html', context={'order': order})
+        return JsonResponse({'data': 'done', 'html': html})

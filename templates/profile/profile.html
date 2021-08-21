@@ -31,7 +31,7 @@
                     Personal Information
                 </a>
             </div>
-            <div onclick="" id="My Order" class="space-y-1 pl-0 pt-4 ">
+            <div onclick="my_order_list()" id="My Order" class="space-y-1 pl-0 pt-4 ">
                 <a href="#" class="text-primary block font-medium capitalize transition">
                     <span class="flex-grow mr-4 top-0 text-base">
                         <i class="fas fa-shopping-basket"></i>
@@ -75,7 +75,7 @@
     {#  account end  #}
     <script>
         function my_address() {
-            console.log('tets')
+
             $.ajax({
                 type: 'GET',
                 url: '{% url 'address_view' %}',
@@ -255,7 +255,7 @@
             let confirm = $('#ConfirmPassword').val()
             let username = '{{ user }}';
             let phone = '{{ request.customer.phone }}';
-            console.log(username,phone)
+            console.log(username, phone)
             if (confirm_password() && passworrd && confirm) {
                 $.ajax({
                     type: 'PUT',
@@ -264,8 +264,8 @@
                         "X-CSRFTOKEN": "{{ csrf_token }}"
                     },
                     data: {
-                        'username':username,
-                        'phone':phone,
+                        'username': username,
+                        'phone': phone,
                         'password': passworrd,
                         'is_active': true,
                     },
@@ -275,6 +275,32 @@
                     }
                 })
             }
+        }
+
+        function my_order_list() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url 'my_order_list' %}',
+                headers: {
+                    "X-CSRFTOKEN": "{{ csrf_token }}"
+                },
+                success: function (response, status, xhr) {
+                    $('#Profile').html(response.html)
+                }
+            })
+        }
+
+        function my_order_detail(order_id) {
+            $.ajax({
+                type: 'GET',
+                url: "http://127.0.0.1:8000/my-order-detail/" + order_id,
+                headers: {
+                    "X-CSRFTOKEN": "{{ csrf_token }}"
+                },
+                success: function (response, status, xhr) {
+                    $('#Profile').html(response.html)
+                }
+            })
         }
 
     </script>

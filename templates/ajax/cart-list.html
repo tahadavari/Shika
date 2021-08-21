@@ -23,7 +23,8 @@
             </div>
 
             <div class="quantity">
-                <input id='ProductQuantity-{{ order_item.id }}' data-item="{{ order_item.id }}"
+                <input oninput="update_item({{ order_item.id }})" id='ProductQuantity-{{ order_item.id }}'
+                       data-item="{{ order_item.id }}"
                        class='qty-input'
                        type="number" name="name"
                        value="{{ order_item.quantity }}"
@@ -55,15 +56,16 @@
         <div class="final-price">{{ request.cart.calculate_total_finaly }}</div>
 
 
-        <select id="OrderAddress"
+        <select p id="OrderAddress"
                 class="w-32 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
+            <option value="" disabled selected>Your Address</option>
             {% for address in request.cart.customer.addresses.all %}
                 <option value="{{ address.id }}">{{ address.title }}</option>
             {% endfor %}
 
         </select>
     </div>
-    <button id="CheckOutBtn"
+    <button onclick="check_out({{ address.id }})" id="CheckOutBtn"
             class="hover:bg-transparent text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary transition uppercase text-sm">
         Checkout
     </button>

@@ -1,0 +1,59 @@
+<div class="max-w-xl bg-white  mx-auto shadow px-6 py-7 mb-6 rounded overflow-hidden">
+    <h4 class="text-lg font-medium capitalize mb-4">Receipt</h4>
+    <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">Customer</label>
+                <label for=""
+                       class="capitalize text-gray-600 mb-2 block">{{ order.customer.firt_name }} {{ order.customer.last_name }}</label>
+            </div>
+
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">Total amount</label>
+                <label for="" class="capitalize text-gray-600 mb-2 block">{{ order.total_amount }}</label>
+
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="" class="text-gray-600 mb-2 block">Address</label>
+                <label for="" class="capitalize text-gray-600 mb-2 block">{{ order.address.title }}
+                    : {{ order.address.address }}</label>
+            </div>
+        </div>
+        {% for order_item in order.items.all %}
+            <div class="item">
+                <div class="image w-16">
+                    <img id="ProductImage-{{ order_item.id }}" src="{{ order_item.product.main_image.image.url }}"
+                         alt=""/>
+                </div>
+
+                <div class="description">
+                    <span id="ProductName-{{ order_item.id }}">{{ order_item.product.name }}</span>
+                    <span id="ProductSize-{{ order_item.id }}">{{ order_item.size.size }}</span>
+                    <span>Size</span>
+                </div>
+
+                <div class="quantity">
+                    <div>{{ order_item.quantity }}</div>
+                </div>
+                {% if order_item.product.price == order_item.product.final_price %}
+                    <div id="ProductPrice-{{ order_item.id }}"
+                         class="final-price">{{ order_item.product.final_price }}</div>
+                {% else %}
+                    <div id="ProductPrice-{{ order_item.id }}" class="price">{{ order_item.product.price }}</div>
+                {% endif %}
+                <div id="ProductFinalPrice-{{ order_item.id }}"
+                     class="final-price">{{ order_item.product.final_price }}</div>
+                <div id="ProductFinalPrice-{{ order_item.id }}"
+                     class="total-price">{% widthratio order_item.product.final_price 1 order_item.quantity %}</div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="mt-4">
+        <button
+                class="hover:bg-transparent text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary transition uppercase text-sm">
+            <a href="{% url 'home' %}"> Home</a>
+        </button>
+    </div>
+</div>

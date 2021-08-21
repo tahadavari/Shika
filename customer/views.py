@@ -68,6 +68,21 @@ def address_new(request):
 
         return JsonResponse(data)
 
+@login_required
+@api_view(['POST'])
+def address_new_cart(request):
+    if request.method == 'POST':
+        data = {}
+        address = AddressDetailSerializer(data=request.data)
+        if address.is_valid():
+            print(address)
+            address.save()
+            data = {'success': 'Done'}
+        else:
+            data = {'failed': 'ERROR'}
+
+        html = render_to_string('ajax/cart-list.html', context={'request': request})
+        return JsonResponse({'data': data, 'html': html})
 
 @login_required
 @api_view(['GET', 'PUT'])
