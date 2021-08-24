@@ -2,6 +2,7 @@ from django.db import models
 # Create your models here.
 from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse
+from django.contrib import admin
 
 from core.models import BaseModel
 
@@ -80,7 +81,7 @@ class Product(BaseModel):
                     if dis > self.discount.max_discount:
                         return self.price - self.discount.max_discount
                     return self.price - dis
-                return self.price-dis
+                return self.price - dis
             elif self.discount.type == 'AM':
                 return self.price - self.discount.amount
         else:
@@ -89,15 +90,14 @@ class Product(BaseModel):
     def main_image(self):
         return self.images.filter(main=True).first()
 
-    def availability(self):
+    def availability_product(self):
         if len(self.sizes.all().filter(quantity__gt=0)):
             count = 0
             for i in self.sizes.all().filter(quantity__gt=0):
-                count+=i.quantity
+                count += i.quantity
             return count
         else:
-            return False
-
+            return 0
 
 
 class ProductImage(BaseModel):

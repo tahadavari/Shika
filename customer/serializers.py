@@ -35,6 +35,8 @@ class AddressListSerializer(serializers.ModelSerializer):
 
 
 class CustomerDetailSerializer(serializers.ModelSerializer):
+    addresses = serializers.StringRelatedField(many=True, read_only=True)
+
     class Meta:
         model = Customer
         exclude = ['password']
@@ -42,7 +44,9 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
 
 
 class CustomerListSerializer(serializers.ModelSerializer):
+    addresses = serializers.StringRelatedField(many=True, read_only=True)
+
     class Meta:
         model = Customer
-        exclude = ['password']
+        fields = ['id', 'first_name', 'last_name', 'username', 'phone', 'email', 'addresses']
         read_only_fields = ['id']

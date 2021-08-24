@@ -1,5 +1,6 @@
 from django.urls import path
 
+from customer.api import CustomerListApiView, CustomerDetailApiView
 from customer.views import Login, register, logout_user, profile, \
     address_view, address_delete, address_new, address_update, personal_information, change_password, address_new_cart
 from order.views import my_order_list, my_order_detail
@@ -17,6 +18,11 @@ urlpatterns = [
     path('change-password/', change_password, name='change_password'),
     path('my-order-list/', my_order_list, name='my_order_list'),
     path('my-order-detail/<int:pk>', my_order_detail, name='my_order_detail'),
-    path('profile/', profile, name='profile')
-]
+    path('profile/', profile, name='profile'),
 
+    # API url
+
+    path('api-customer-list', CustomerListApiView.as_view(), name='api_customer_list'),
+    path('api-customer-detail', CustomerDetailApiView.as_view(), name='api_customer_detail'),
+
+]

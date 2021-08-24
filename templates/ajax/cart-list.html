@@ -18,7 +18,9 @@
 
             <div class="description">
                 <span id="ProductName-{{ order_item.id }}">{{ order_item.product.name }}</span>
-                <span id="ProductSize-{{ order_item.id }}">{{ order_item.size.size }}</span>
+                <span class="size" data-id="{{ order_item.size.id }}" data-quantity="{{ order_item.quantity }}"
+                      data-order="{{ order_item.id }}"
+                      id="ProductSize-{{ order_item.id }}">{{ order_item.size.size }}</span>
                 <span>Size</span>
             </div>
 
@@ -28,7 +30,8 @@
                        class='qty-input'
                        type="number" name="name"
                        value="{{ order_item.quantity }}"
-                       min="1">
+                       min="1"
+                       max="{{ order_item.size.quantity }}">
             </div>
             {% if order_item.product.price == order_item.product.final_price %}
                 <div id="ProductPrice-{{ order_item.id }}"
@@ -65,10 +68,12 @@
 
         </select>
     </div>
-    <button onclick="check_out({{ address.id }})" id="CheckOutBtn"
-            class="hover:bg-transparent text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary transition uppercase text-sm">
-        Checkout
-    </button>
+    {% if request.cart.get_count != 0 and request.cart %}
+        <button onclick="check_out({{ address.id }})" id="CheckOutBtn"
+                class="hover:bg-transparent text-center bg-primary border border-primary text-white px-4 py-3 font-medium rounded-md hover:text-primary transition uppercase text-sm">
+            Checkout
+        </button>
+    {% endif %}
 
 
 </div>

@@ -95,6 +95,13 @@ def delete_from_cart(request):
 
 
 @login_required()
+def check_quantity(request):
+    size: Size = Size.objects.get(id=int(request.POST['id']))
+    inventory = size.quantity - int(request.POST['quantity'])
+    return JsonResponse({'data': 'done', 'inventory': inventory, 'quantity': size.quantity})
+
+
+@login_required()
 def update_to_cart(request):
     if request.method == 'POST':
         order_item = request.cart.items.get(id=int(request.POST['id']))
@@ -116,6 +123,15 @@ def check_out(request):
         order.status = 'CO'
 
         order.save()
+
+        for order_item in order.items.all():
+            size: Size = order_item.size
+            size.quantity -= order_item.quantity
+            size.save()
+            product = order_item.product
+            product.sale += order_item.quantity
+            product.save()
+
         html = render_to_string('receipt.html', context={'order': order})
         return JsonResponse({'data': 'done', 'html': html})
 
@@ -131,7 +147,7 @@ def my_order_list(request):
 
 @login_required
 @api_view(['GET'])
-def my_order_detail(request,pk):
+def my_order_detail(request, pk):
     if request.method == 'GET':
         order = Order.objects.get(id=pk)
         html = render_to_string('profile/order_detail.html', context={'order': order})

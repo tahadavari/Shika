@@ -18,6 +18,8 @@ def product_detail(request, pk):
     parent_category = Category.objects.filter(parent=None)
     child_category = Category.objects.filter(~Q(parent=None))
     product = Product.objects.get(id=pk)
+    product.view += 1
+    product.save()
     product_image_main = ProductImage.objects.filter(main=True, product_id=product).first()
     product_images = ProductImage.objects.filter(product_id=product)
     product_sizes = Size.objects.filter(product=product)

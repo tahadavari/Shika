@@ -67,7 +67,9 @@
 
                     <div class="description">
                         <span id="ProductName-{{ order_item.id }}">{{ order_item.product.name }}</span>
-                        <span id="ProductSize-{{ order_item.id }}">{{ order_item.size.size }}</span>
+                        <span class="size" data-id="{{ order_item.size.id }}" data-quantity="{{ order_item.quantity }}"
+                              data-order="{{ order_item.id }}"
+                              id="ProductSize-{{ order_item.id }}">{{ order_item.size.size }}</span>
                         <span>Size</span>
                     </div>
 
@@ -77,7 +79,8 @@
                                class='qty-input'
                                type="number" name="name"
                                value="{{ order_item.quantity }}"
-                               min="1">
+                               min="1"
+                               max="{{ order_item.size.quantity }}">
                     </div>
                     {% if order_item.product.price == order_item.product.final_price %}
                         <div id="ProductPrice-{{ order_item.id }}"
@@ -113,6 +116,15 @@
                     {% endfor %}
 
                 </select>
+            </div>
+
+            <div class="item w-72 max-w-xl">
+                <input type="text"
+                       class="text-center w-full border border-primary border-r-0  py-3 pr-3 rounded-l-md focus:outline-none"
+                       placeholder="off code">
+                <button class="items-center flex bg-primary border border-primary text-white px-3 rounded-r-md hover:bg-transparent hover:text-primary transition">
+                    Accept
+                </button>
             </div>
             {% if request.cart.get_count != 0 and request.cart %}
                 <button onclick="check_out({{ address.id }})" id="CheckOutBtn"
@@ -179,7 +191,6 @@
     <script>
 
         function delete_item(order_id) {
-            console.log(order_id)
             $.ajax({
                 type: 'POST',
                 url: '{% url 'delete_from_cart' %}',
@@ -191,14 +202,61 @@
                 },
                 success: function (response, status, xhr) {
                     $('#CartList').html(response.html)
+                    iziToast.show({
+                        title: 'DELETE',
+                        message: 'Product removed from your cart',
+                        color: 'red'
+                    });
                 }
             })
+        }
+
+        function check_quantity() {
+            let sizes = document.getElementsByClassName('size')
+            let flag = true
+            for (let z = 0; z < sizes.length; z++) {
+                let size_id = $(sizes[z]).data('id')
+                let quantity = $(sizes[z]).data('quantity')
+                let order_id = $(sizes[z]).data('order')
+                console.log('id', size_id)
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url 'check_quantity' %}',
+                    headers: {
+                        "X-CSRFTOKEN": "{{ csrf_token }}"
+                    },
+                    data: {
+                        'id': size_id,
+                        'quantity': quantity,
+                    },
+                    success: function (response, status, xhr) {
+                        if (response.inventory >= 0) {
+                            flag = true
+                        } else if (response.inventory === -quantity) {
+                            iziToast.show({
+                                title: 'Not Available',
+                                message: 'This product is no longer available',
+                                color: 'red'
+                            });
+                            delete_item(order_id)
+                        } else {
+                            iziToast.show({
+                                title: 'Not Available',
+                                message: 'This product is available in ' + response.quantity + ' pieces',
+                                color: 'yellow'
+                            });
+                        }
+
+                    }
+                })
+            }
+            return flag
+
         }
 
         function update_item(id) {
             let order_id = id;
             let quantity = $('#ProductQuantity-' + order_id).val();
-            console.log(quantity)
             $.ajax({
                 type: 'POST',
                 url: '{% url 'update_to_cart' %}',
@@ -247,23 +305,31 @@
         }
 
         function check_out(id) {
-            let order_id = id
-            let address_id = $("#OrderAddress option:selected").val();
-            if (address_id) {
+            if (check_quantity(id)) {
+                let order_id = id
+                let address_id = $("#OrderAddress option:selected").val();
+                if (address_id) {
 
-                $.ajax({
-                    type: 'POST',
-                    url: '{% url 'check_out' %}',
-                    headers: {
-                        "X-CSRFTOKEN": "{{ csrf_token }}"
-                    },
-                    data: {
-                        'address': address_id
-                    },
-                    success: function (response, status, xhr) {
-                        $('#CartList').html(response.html)
-                    }
-                })
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url 'check_out' %}',
+                        headers: {
+                            "X-CSRFTOKEN": "{{ csrf_token }}"
+                        },
+                        data: {
+                            'address': address_id
+                        },
+                        success: function (response, status, xhr) {
+                            $('#CartList').html(response.html)
+                        }
+                    })
+                } else {
+                    iziToast.show({
+                        title: 'Address',
+                        message: 'Please select your address',
+                        color: 'yellow'
+                    });
+                }
             }
         }
 

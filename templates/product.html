@@ -54,18 +54,20 @@
             <p class="mt-4 text-gray-600">
                 cmkmdkcmK:Mck;MKmcKLmckl;McklMckl;mKL:MDcklmKL:DcKL:Mckl;ml
             </p>
-            {% if product.availability %}
+            {% if product.availability_product %}
                 <input type="hidden" id="ProductId" value="{{ product.id }}">
                 <input type="hidden" id="ProductName" value="{{ product.name }}">
                 <div class="mt-4">
                     <p class="text-gray-800 font-semibold">
                         <span>Size : </span>
                     </p>
-                    <select id="ProductSize"
+                    <select onselect="max_quantity()" onchange="max_quantity()" id="ProductSize"
                             class="w-44 text-sm text-gray-600 px-4 py-3 border-gray-300 shadow-sm rounded-md focus:ring-primary focus:border-primary">
+                        <option value="" disabled selected>Choose Size</option>
                         {% for size in product_sizes %}
                             {% if size.quantity != 0 %}
-                                <option value="{{ size.id }}">{{ size.size }}</option>
+                                <option data-quantity="{{ size.quantity }}"
+                                        value="{{ size.id }}">{{ size.size }}</option>
                             {% endif %}
                         {% endfor %}
 
@@ -74,14 +76,14 @@
                 <div class="mt-4">
                     <h3 class="text-sm text-gray-800 uppercase mb-1">Quantity</h3>
                     <div class="flex border border-gray-300 text-gray-600 divide-x divide-gray-300 w-max">
-                        <input type="number" id="ProductQuantity" value="1"
+                        <input min="1" type="number" id="ProductQuantity" value="1"
                                class="w-44 rounded text-base flex items-center justify-center text-center">
                     </div>
                 </div>
             {% endif %}
 
             <div class="flex gap-3 border-b border-gray-200 pb-5 mt-6">
-                {% if product.availability %}
+                {% if product.availability_product %}
                     <button id="AddToCartBtn" data-product="{{ product.id }}" data-action="add"
                             class="bg-primary border border-primary text-white px-8 py-2 font-medium rounded uppercase flex items-center gap-2 hover:bg-transparent hover:text-primary transition update-cart">
                         <i class="fas fa-shopping-bag"></i> Add to cart
@@ -110,31 +112,52 @@
             let p_name = $('#ProductName').val();
             let order = '{{ request.cart.id }}';
             let total = p_quantity * p_final_price
-            console.log(p_size)
+            if (p_size) {
 
-            $.ajax({
-                type: 'POST',
-                url: '{% url 'add_to_cart' %}',
-                headers: {
-                    "X-CSRFTOKEN": "{{ csrf_token }}"
-                },
-                data: {
-                    'total': total,
-                    'order': order,
-                    'id': p_id,
-                    'quantity': p_quantity,
-                    'size': p_size,
-                    'price': p_price,
-                    'final_price': p_final_price,
-                    'name': p_name,
-                    'main_image': p_image
-                },
-                success: function (response, status, xhr) {
-                    $('#CartQuantity').text(response.total_item)
-                    $('#CartQuantity_auth').text(response.total_item)
-                }
-            })
+
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url 'add_to_cart' %}',
+                    headers: {
+                        "X-CSRFTOKEN": "{{ csrf_token }}"
+                    },
+                    data: {
+                        'total': total,
+                        'order': order,
+                        'id': p_id,
+                        'quantity': p_quantity,
+                        'size': p_size,
+                        'price': p_price,
+                        'final_price': p_final_price,
+                        'name': p_name,
+                        'main_image': p_image
+                    },
+                    success: function (response, status, xhr) {
+                        $('#CartQuantity').text(response.total_item)
+                        $('#CartQuantity_auth').text(response.total_item)
+                        iziToast.show({
+                            title: 'ADD',
+                            message: 'Product add to your cart',
+                            color: 'green'
+                        });
+                    }
+                })
+            } else {
+                iziToast.show({
+                    title: 'SIZE',
+                    message: 'Choose your shoes size',
+                    color: 'yellow'
+                });
+            }
         })
+
+        function max_quantity() {
+            {#let p_size_id = $('#ProductSize option:selected').val()#}
+            let p_size_qty = $('#ProductSize option:selected').data('quantity')
+            $('#ProductQuantity').attr('max', p_size_qty)
+            $('#ProductQuantity').val('1')
+
+        }
     </script>
 
 {% endblock %}

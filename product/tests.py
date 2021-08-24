@@ -71,5 +71,5 @@ class ProductModelTest(TestCase):
             quantity=3,
             size=42
         )
-        self.assertTrue(p1.availability())
-        self.assertEqual(p1.availability(), 8)
+        self.assertTrue(p1.availability_product())
+        self.assertEqual(p1.availability_product(), 8)

@@ -172,3 +172,4 @@ def change_password(request):
         customer.save()
         logout(request)
         return JsonResponse(data)
+

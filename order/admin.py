@@ -10,4 +10,13 @@ class InLineOrderItem(admin.StackedInline):
     extra = 1
 
 
-admin.site.register([Order, OrderItem])
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('product','size','quantity','total')
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id','customer','total_amount','status')
+    list_filter = ('status',)
+
